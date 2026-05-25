@@ -1,26 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { TopBar } from "@/components/mcq/TopBar";
+import { QuestionCanvas } from "@/components/mcq/QuestionCanvas";
+import { OptionsList } from "@/components/mcq/OptionsList";
+import { SolutionPanel } from "@/components/mcq/SolutionPanel";
+import { SlideStrip } from "@/components/mcq/SlideStrip";
+import { BottomToolbar } from "@/components/mcq/BottomToolbar";
+import { ShapePicker } from "@/components/mcq/ShapePicker";
+import { LabelPicker } from "@/components/mcq/LabelPicker";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Editor,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Editor() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex flex-col h-screen bg-background">
+      <TopBar />
+      <main className="flex-1 overflow-y-auto pb-2">
+        <QuestionCanvas />
+        <OptionsList />
+        <SolutionPanel />
+      </main>
+      <SlideStrip />
+      <BottomToolbar />
+      <ShapePicker />
+      <LabelPicker />
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }

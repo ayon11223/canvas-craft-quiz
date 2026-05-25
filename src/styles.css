@@ -90,3 +90,4 @@
   background-size: 18px 18px, 11px 11px;
   background-position: 0 0, 7px 9px;
 }
+.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
