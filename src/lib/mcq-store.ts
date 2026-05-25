@@ -24,7 +24,8 @@ export type ShapeKind =
   | "cylinder"
   | "axis"
   | "line"
-  | "equation";
+  | "equation"
+  | "text";
 
 export interface CanvasItem {
   id: string;
