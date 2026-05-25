@@ -157,14 +157,15 @@ export const useMcq = create<State>((set, get) => ({
     get().updateCurrent({ figureOpen: !q.figureOpen });
   },
   addItem: (kind, label) => {
+    const isText = kind === "text";
     const item: CanvasItem = {
       id: uid(),
       kind,
-      x: 0.3,
-      y: 0.3,
-      w: 0.35,
-      h: 0.35,
-      label,
+      x: isText ? 0.15 : 0.3,
+      y: isText ? 0.1 : 0.3,
+      w: isText ? 0.6 : 0.35,
+      h: isText ? 0.12 : 0.35,
+      label: isText ? (label ?? "Text") : label,
     };
     set((s) => ({
       questions: s.questions.map((q) =>
