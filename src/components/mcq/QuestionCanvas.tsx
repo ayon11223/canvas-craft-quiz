@@ -1,6 +1,6 @@
-import { useRef, type PointerEvent } from "react";
+import { useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Trash2, Move } from "lucide-react";
 import { useCurrentQuestion, useMcq, type CanvasItem } from "@/lib/mcq-store";
 import { Shape } from "./Shape";
 
@@ -76,7 +76,7 @@ function FigureArea() {
       }}
     >
       {q.text && (
-        <div className="absolute top-0 left-0 right-0 text-[13px] text-canvas-foreground/80">
+        <div className="absolute top-0 left-0 right-0 text-[13px] text-canvas-foreground/80 pointer-events-none">
           {q.text}
         </div>
       )}
@@ -91,7 +91,7 @@ function FigureArea() {
         ))}
       </AnimatePresence>
       {q.items.length === 0 && (
-        <div className="absolute inset-0 grid place-items-center text-canvas-foreground/40 text-xs text-center px-6">
+        <div className="absolute inset-0 grid place-items-center text-canvas-foreground/40 text-xs text-center px-6 pointer-events-none">
           Tap + to add shapes, equations or import figures
         </div>
       )}
@@ -109,13 +109,14 @@ function DraggableItem({
   selected: boolean;
 }) {
   const { updateItem, selectItem, removeItem } = useMcq();
+  const isText = item.kind === "text";
 
-  const startDrag = (e: PointerEvent<HTMLDivElement>, mode: "move" | "resize") => {
+  const startDrag = (e: ReactPointerEvent, mode: "move" | "resize") => {
     e.stopPropagation();
+    e.preventDefault();
     selectItem(item.id);
-    const target = e.currentTarget;
-    target.setPointerCapture(e.pointerId);
-    const rect = containerRef.current!.getBoundingClientRect();
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
     const startX = e.clientX;
     const startY = e.clientY;
     const start = { x: item.x, y: item.y, w: item.w, h: item.h };
@@ -125,23 +126,24 @@ function DraggableItem({
       const dy = (ev.clientY - startY) / rect.height;
       if (mode === "move") {
         updateItem(item.id, {
-          x: clamp(start.x + dx, 0, 1 - start.w),
-          y: clamp(start.y + dy, 0, 1 - start.h),
+          x: clamp(start.x + dx, 0, Math.max(0, 1 - start.w)),
+          y: clamp(start.y + dy, 0, Math.max(0, 1 - start.h)),
         });
       } else {
         updateItem(item.id, {
-          w: clamp(start.w + dx, 0.1, 1 - item.x),
-          h: clamp(start.h + dy, 0.1, 1 - item.y),
+          w: clamp(start.w + dx, 0.08, 1 - start.x),
+          h: clamp(start.h + dy, 0.06, 1 - start.y),
         });
       }
     };
-    const onUp = (ev: PointerEvent) => {
-      target.releasePointerCapture(ev.pointerId);
-      target.removeEventListener("pointermove", onMove as never);
-      target.removeEventListener("pointerup", onUp as never);
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
     };
-    target.addEventListener("pointermove", onMove as never);
-    target.addEventListener("pointerup", onUp as never);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
   };
 
   return (
@@ -150,21 +152,44 @@ function DraggableItem({
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.6, opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 22 }}
-      className="absolute touch-none select-none"
+      className="absolute select-none"
       style={{
         left: `${item.x * 100}%`,
         top: `${item.y * 100}%`,
         width: `${item.w * 100}%`,
         height: `${item.h * 100}%`,
+        touchAction: "none",
       }}
-      onPointerDown={(e) => startDrag(e, "move")}
+      onPointerDown={(e) => {
+        // Text items: only the move handle drags. Body is editable.
+        if (isText) {
+          selectItem(item.id);
+          return;
+        }
+        startDrag(e, "move");
+      }}
     >
       <div
         className={`relative w-full h-full rounded-md ${
           selected ? "ring-2 ring-primary" : ""
         }`}
       >
-        <Shape kind={item.kind} label={item.label} className="w-full h-full pointer-events-none" />
+        {isText ? (
+          <input
+            value={item.label ?? ""}
+            onChange={(e) => updateItem(item.id, { label: e.target.value })}
+            onFocus={() => selectItem(item.id)}
+            placeholder="Text"
+            className="w-full h-full bg-transparent border-0 outline-none text-canvas-foreground text-[14px] leading-tight px-1"
+            style={{ touchAction: "auto" }}
+          />
+        ) : (
+          <Shape
+            kind={item.kind}
+            label={item.label}
+            className="w-full h-full pointer-events-none"
+          />
+        )}
         {selected && (
           <>
             <button
@@ -176,9 +201,19 @@ function DraggableItem({
             >
               <Trash2 className="size-3" />
             </button>
+            {isText && (
+              <button
+                onPointerDown={(e) => startDrag(e, "move")}
+                className="absolute -top-3 left-5 size-6 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-pop cursor-move"
+                aria-label="Move"
+              >
+                <Move className="size-3" />
+              </button>
+            )}
             <div
               onPointerDown={(e) => startDrag(e, "resize")}
               className="absolute -bottom-2 -right-2 size-5 rounded-full bg-primary border-2 border-canvas cursor-se-resize"
+              style={{ touchAction: "none" }}
             />
           </>
         )}
