@@ -1,15 +1,15 @@
-import { FolderOpen, Camera, Plus, FileEdit, Sparkles } from "lucide-react";
+import { FolderOpen, Camera, Plus, Type, Sparkles } from "lucide-react";
 import { useMcq } from "@/lib/mcq-store";
 
 export function BottomToolbar() {
-  const { setShapePicker, setSolutionOpen, solutionOpen } = useMcq();
+  const { setShapePicker, setSolutionOpen, solutionOpen, addItem } = useMcq();
 
   const items = [
     { icon: FolderOpen, label: "Library", onClick: () => {} },
     { icon: Camera, label: "Scan", onClick: () => {} },
     { icon: Plus, label: "Add", primary: true, onClick: () => setShapePicker(true) },
-    { icon: FileEdit, label: "CQ", onClick: () => setSolutionOpen(!solutionOpen) },
-    { icon: Sparkles, label: "AI", onClick: () => setSolutionOpen(true) },
+    { icon: Type, label: "Text", onClick: () => addItem("text", "") },
+    { icon: Sparkles, label: "AI", onClick: () => setSolutionOpen(!solutionOpen) },
   ];
 
   return (
