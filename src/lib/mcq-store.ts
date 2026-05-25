@@ -144,6 +144,14 @@ export const useMcq = create<State>((set, get) => ({
         q.id === s.currentId ? { ...q, options: q.options.filter((o) => o.id !== id) } : q,
       ),
     })),
+  clearOptions: () =>
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId
+          ? { ...q, options: q.options.map((o) => ({ ...o, text: "", correct: false })) }
+          : q,
+      ),
+    })),
   toggleFigure: () => {
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
