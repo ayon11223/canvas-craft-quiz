@@ -23,7 +23,7 @@ export function SlideStrip() {
         </button>
 
         <div className="flex-1 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-3 px-1 min-w-min">
+          <div className="flex items-center justify-center gap-3 px-1 min-w-min mx-auto w-fit">
             {questions.map((q, i) => {
               const active = q.id === currentId;
               return (

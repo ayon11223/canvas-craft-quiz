@@ -1,13 +1,13 @@
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreVertical, Check } from "lucide-react";
+import { GripVertical, MoreVertical, Check, Eraser } from "lucide-react";
 import { LABEL_STYLES, useCurrentQuestion, useMcq, type Option } from "@/lib/mcq-store";
 import { useLongPress } from "@/hooks/use-long-press";
 
 export function OptionsList() {
   const q = useCurrentQuestion();
-  const { reorderOptions, setLabelPickerOpen } = useMcq();
+  const { reorderOptions, setLabelPickerOpen, clearOptions } = useMcq();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const renderLabel = LABEL_STYLES.find((s) => s.id === q.labelStyle)!.render;
 
@@ -22,6 +22,18 @@ export function OptionsList() {
 
   return (
     <div className="px-4 mt-4">
+      <div className="flex items-center justify-between mb-1.5 px-1">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Choices
+        </span>
+        <button
+          onClick={clearOptions}
+          className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition px-2 py-1 rounded-md hover:bg-destructive/10"
+          aria-label="Clear all choices"
+        >
+          <Eraser className="size-3" /> Clear
+        </button>
+      </div>
       <div className="rounded-2xl bg-card p-3 shadow-soft border border-border">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={q.options.map((o) => o.id)} strategy={verticalListSortingStrategy}>

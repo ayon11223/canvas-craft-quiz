@@ -24,7 +24,8 @@ export type ShapeKind =
   | "cylinder"
   | "axis"
   | "line"
-  | "equation";
+  | "equation"
+  | "text";
 
 export interface CanvasItem {
   id: string;
@@ -67,6 +68,7 @@ interface State {
   reorderOptions: (ids: string[]) => void;
   addOption: () => void;
   removeOption: (id: string) => void;
+  clearOptions: () => void;
   toggleFigure: () => void;
   addItem: (kind: ShapeKind, label?: string) => void;
   updateItem: (id: string, patch: Partial<CanvasItem>) => void;
@@ -142,19 +144,28 @@ export const useMcq = create<State>((set, get) => ({
         q.id === s.currentId ? { ...q, options: q.options.filter((o) => o.id !== id) } : q,
       ),
     })),
+  clearOptions: () =>
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId
+          ? { ...q, options: q.options.map((o) => ({ ...o, text: "", correct: false })) }
+          : q,
+      ),
+    })),
   toggleFigure: () => {
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
   },
   addItem: (kind, label) => {
+    const isText = kind === "text";
     const item: CanvasItem = {
       id: uid(),
       kind,
-      x: 0.3,
-      y: 0.3,
-      w: 0.35,
-      h: 0.35,
-      label,
+      x: isText ? 0.15 : 0.3,
+      y: isText ? 0.1 : 0.3,
+      w: isText ? 0.6 : 0.35,
+      h: isText ? 0.12 : 0.35,
+      label: isText ? (label ?? "Text") : label,
     };
     set((s) => ({
       questions: s.questions.map((q) =>
