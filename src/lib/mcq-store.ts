@@ -68,6 +68,7 @@ interface State {
   reorderOptions: (ids: string[]) => void;
   addOption: () => void;
   removeOption: (id: string) => void;
+  clearOptions: () => void;
   toggleFigure: () => void;
   addItem: (kind: ShapeKind, label?: string) => void;
   updateItem: (id: string, patch: Partial<CanvasItem>) => void;
