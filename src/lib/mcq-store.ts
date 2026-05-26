@@ -44,11 +44,14 @@ export interface Option {
   correct?: boolean;
 }
 
+export type CanvasSize = "closed" | "half" | "full";
+
 export interface Question {
   id: string;
   text: string;
   items: CanvasItem[];
   figureOpen: boolean;
+  canvasSize: CanvasSize;
   options: Option[];
   labelStyle: LabelStyle;
   solution: string;
