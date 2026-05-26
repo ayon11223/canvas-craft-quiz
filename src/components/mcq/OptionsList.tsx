@@ -1,13 +1,13 @@
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreVertical, Check, Eraser } from "lucide-react";
+import { GripVertical, Trash2, Check, Shuffle, Type, Settings2, Lock } from "lucide-react";
 import { LABEL_STYLES, useCurrentQuestion, useMcq, type Option } from "@/lib/mcq-store";
 import { useLongPress } from "@/hooks/use-long-press";
 
 export function OptionsList() {
   const q = useCurrentQuestion();
-  const { reorderOptions, setLabelPickerOpen, clearOptions } = useMcq();
+  const { reorderOptions, setLabelPickerOpen, shuffleOptions, autoFillOptions, setOptionsSettingsOpen } = useMcq();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const renderLabel = LABEL_STYLES.find((s) => s.id === q.labelStyle)!.render;
 
@@ -22,17 +22,24 @@ export function OptionsList() {
 
   return (
     <div className="px-4 mt-4">
-      <div className="flex items-center justify-between mb-1.5 px-1">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          Choices
-        </span>
+      <div className="flex items-center justify-between mb-2 px-1">
         <button
-          onClick={clearOptions}
-          className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition px-2 py-1 rounded-md hover:bg-destructive/10"
-          aria-label="Clear all choices"
+          onClick={autoFillOptions}
+          className="flex items-center gap-1.5 text-[10px] font-display font-semibold uppercase tracking-wider text-muted-foreground bg-secondary/60 rounded-full pl-2 pr-3 py-1.5 hover:text-foreground transition"
         >
-          <Eraser className="size-3" /> Clear
+          <Lock className="size-3" /> Auto-Fill
         </button>
+        <div className="flex items-center gap-1">
+          <IconBtn label="Shuffle" onClick={shuffleOptions}>
+            <Shuffle className="size-4" />
+          </IconBtn>
+          <IconBtn label="Text style" onClick={() => {}}>
+            <Type className="size-4" />
+          </IconBtn>
+          <IconBtn label="Choice settings" onClick={() => setOptionsSettingsOpen(true)} accent>
+            <Settings2 className="size-4" />
+          </IconBtn>
+        </div>
       </div>
       <div className="rounded-2xl bg-card p-3 shadow-soft border border-border">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -44,6 +51,7 @@ export function OptionsList() {
                   option={o}
                   label={renderLabel(i)}
                   labelHandlers={longPress}
+                  tickStyle={q.tickStyle}
                 />
               ))}
             </div>
@@ -54,19 +62,51 @@ export function OptionsList() {
   );
 }
 
+function IconBtn({
+  children,
+  onClick,
+  label,
+  accent,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  label: string;
+  accent?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className={`size-8 grid place-items-center rounded-full transition ${
+        accent
+          ? "bg-primary/15 text-primary hover:bg-primary/25"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function SortableOption({
   option,
   label,
   labelHandlers,
+  tickStyle,
 }: {
   option: Option;
   label: string;
   labelHandlers: ReturnType<typeof useLongPress>;
+  tickStyle: "label" | "green" | "side";
 }) {
   const { setOption, removeOption } = useMcq();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: option.id,
   });
+
+  const showCheckInLabel = tickStyle === "label" && option.correct;
+  const greenRow = tickStyle === "green" && option.correct;
+  const sideTick = tickStyle === "side" && option.correct;
 
   return (
     <div
@@ -76,9 +116,9 @@ function SortableOption({
         transition,
         zIndex: isDragging ? 50 : "auto",
       }}
-      className={`group flex items-center gap-2 rounded-xl bg-secondary/60 pl-1 pr-2 ${
-        isDragging ? "shadow-pop ring-1 ring-primary/40" : ""
-      }`}
+      className={`group flex items-center gap-2 rounded-xl pl-1 pr-2 transition ${
+        greenRow ? "bg-emerald-500/15 ring-1 ring-emerald-500/40" : "bg-secondary/60"
+      } ${isDragging ? "shadow-pop ring-1 ring-primary/40" : ""}`}
     >
       <button
         {...attributes}
@@ -92,12 +132,14 @@ function SortableOption({
         {...labelHandlers}
         onClick={() => setOption(option.id, { correct: !option.correct })}
         className={`relative font-display font-semibold text-sm size-8 rounded-lg grid place-items-center shrink-0 transition ${
-          option.correct
+          showCheckInLabel
             ? "bg-primary text-primary-foreground"
-            : "bg-background text-foreground"
+            : greenRow
+              ? "bg-emerald-500 text-white"
+              : "bg-background text-foreground"
         }`}
       >
-        {option.correct ? <Check className="size-4" /> : label}
+        {showCheckInLabel ? <Check className="size-4" /> : label}
       </button>
       <input
         value={option.text}
@@ -105,12 +147,17 @@ function SortableOption({
         placeholder={`Option ${label}`}
         className="flex-1 bg-transparent text-sm py-3 outline-none placeholder:text-muted-foreground/60"
       />
+      {sideTick && (
+        <span className="size-5 rounded-full bg-emerald-500 grid place-items-center shrink-0">
+          <Check className="size-3 text-white" />
+        </span>
+      )}
       <button
         onClick={() => removeOption(option.id)}
-        className="p-2 text-muted-foreground/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition"
+        className="p-2 text-muted-foreground/60 hover:text-destructive transition"
         aria-label="Remove option"
       >
-        <MoreVertical className="size-4" />
+        <Trash2 className="size-4" />
       </button>
     </div>
   );

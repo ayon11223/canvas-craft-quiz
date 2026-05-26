@@ -7,6 +7,7 @@ import { SlideStrip } from "@/components/mcq/SlideStrip";
 import { BottomToolbar } from "@/components/mcq/BottomToolbar";
 import { ShapePicker } from "@/components/mcq/ShapePicker";
 import { LabelPicker } from "@/components/mcq/LabelPicker";
+import { OptionsSettings } from "@/components/mcq/OptionsSettings";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -25,6 +26,7 @@ function Editor() {
       <BottomToolbar />
       <ShapePicker />
       <LabelPicker />
+      <OptionsSettings />
     </div>
   );
 }

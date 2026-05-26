@@ -46,6 +46,8 @@ export interface Option {
 
 export type CanvasSize = "closed" | "half" | "full";
 
+export type TickStyle = "label" | "green" | "side";
+
 export interface Question {
   id: string;
   text: string;
@@ -54,6 +56,7 @@ export interface Question {
   canvasSize: CanvasSize;
   options: Option[];
   labelStyle: LabelStyle;
+  tickStyle: TickStyle;
   solution: string;
 }
 
@@ -64,6 +67,7 @@ interface State {
   shapePickerOpen: boolean;
   solutionOpen: boolean;
   labelPickerOpen: boolean;
+  optionsSettingsOpen: boolean;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
   updateCurrent: (patch: Partial<Question>) => void;
@@ -72,6 +76,8 @@ interface State {
   addOption: () => void;
   removeOption: (id: string) => void;
   clearOptions: () => void;
+  shuffleOptions: () => void;
+  autoFillOptions: () => void;
   toggleFigure: () => void;
   cycleCanvasSize: () => void;
   shrinkCanvas: () => void;
@@ -82,7 +88,9 @@ interface State {
   setShapePicker: (v: boolean) => void;
   setSolutionOpen: (v: boolean) => void;
   setLabelPickerOpen: (v: boolean) => void;
+  setOptionsSettingsOpen: (v: boolean) => void;
   setLabelStyle: (s: LabelStyle) => void;
+  setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
 }
 
@@ -95,6 +103,7 @@ const blankQuestion = (): Question => ({
   figureOpen: false,
   canvasSize: "closed",
   labelStyle: "A",
+  tickStyle: "label",
   solution: "",
   options: [
     { id: uid(), text: "" },
@@ -113,6 +122,7 @@ export const useMcq = create<State>((set, get) => ({
   shapePickerOpen: false,
   solutionOpen: false,
   labelPickerOpen: false,
+  optionsSettingsOpen: false,
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     const q = blankQuestion();
@@ -158,6 +168,35 @@ export const useMcq = create<State>((set, get) => ({
           : q,
       ),
     })),
+  shuffleOptions: () =>
+    set((s) => ({
+      questions: s.questions.map((q) => {
+        if (q.id !== s.currentId) return q;
+        const arr = [...q.options];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return { ...q, options: arr };
+      }),
+    })),
+  autoFillOptions: () => {
+    const samples = ["Lorem ipsum", "Dolor sit amet", "Consectetur", "Adipiscing elit", "Sed do eiusmod", "Tempor incididunt"];
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId
+          ? {
+              ...q,
+              options: q.options.map((o, i) => ({
+                ...o,
+                text: samples[i % samples.length],
+                correct: i === 0,
+              })),
+            }
+          : q,
+      ),
+    }));
+  },
   toggleFigure: () => {
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
@@ -211,7 +250,9 @@ export const useMcq = create<State>((set, get) => ({
   setShapePicker: (v) => set({ shapePickerOpen: v }),
   setSolutionOpen: (v) => set({ solutionOpen: v }),
   setLabelPickerOpen: (v) => set({ labelPickerOpen: v }),
+  setOptionsSettingsOpen: (v) => set({ optionsSettingsOpen: v }),
   setLabelStyle: (s) => get().updateCurrent({ labelStyle: s }),
+  setTickStyle: (s) => get().updateCurrent({ tickStyle: s }),
   setSolution: (s) => get().updateCurrent({ solution: s }),
 }));
 
