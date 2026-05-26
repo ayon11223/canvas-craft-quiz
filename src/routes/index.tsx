@@ -26,6 +26,7 @@ function Editor() {
       <BottomToolbar />
       <ShapePicker />
       <LabelPicker />
+      <OptionsSettings />
     </div>
   );
 }
