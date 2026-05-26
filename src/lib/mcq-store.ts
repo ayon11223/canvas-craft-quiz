@@ -67,6 +67,7 @@ interface State {
   shapePickerOpen: boolean;
   solutionOpen: boolean;
   labelPickerOpen: boolean;
+  optionsSettingsOpen: boolean;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
   updateCurrent: (patch: Partial<Question>) => void;
@@ -75,6 +76,8 @@ interface State {
   addOption: () => void;
   removeOption: (id: string) => void;
   clearOptions: () => void;
+  shuffleOptions: () => void;
+  autoFillOptions: () => void;
   toggleFigure: () => void;
   cycleCanvasSize: () => void;
   shrinkCanvas: () => void;
@@ -85,7 +88,9 @@ interface State {
   setShapePicker: (v: boolean) => void;
   setSolutionOpen: (v: boolean) => void;
   setLabelPickerOpen: (v: boolean) => void;
+  setOptionsSettingsOpen: (v: boolean) => void;
   setLabelStyle: (s: LabelStyle) => void;
+  setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
 }
 
@@ -98,6 +103,7 @@ const blankQuestion = (): Question => ({
   figureOpen: false,
   canvasSize: "closed",
   labelStyle: "A",
+  tickStyle: "label",
   solution: "",
   options: [
     { id: uid(), text: "" },
