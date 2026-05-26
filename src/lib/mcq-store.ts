@@ -122,6 +122,7 @@ export const useMcq = create<State>((set, get) => ({
   shapePickerOpen: false,
   solutionOpen: false,
   labelPickerOpen: false,
+  optionsSettingsOpen: false,
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     const q = blankQuestion();
