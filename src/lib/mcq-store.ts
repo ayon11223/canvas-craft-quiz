@@ -250,7 +250,9 @@ export const useMcq = create<State>((set, get) => ({
   setShapePicker: (v) => set({ shapePickerOpen: v }),
   setSolutionOpen: (v) => set({ solutionOpen: v }),
   setLabelPickerOpen: (v) => set({ labelPickerOpen: v }),
+  setOptionsSettingsOpen: (v) => set({ optionsSettingsOpen: v }),
   setLabelStyle: (s) => get().updateCurrent({ labelStyle: s }),
+  setTickStyle: (s) => get().updateCurrent({ tickStyle: s }),
   setSolution: (s) => get().updateCurrent({ solution: s }),
 }));
 
