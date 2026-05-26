@@ -44,11 +44,14 @@ export interface Option {
   correct?: boolean;
 }
 
+export type CanvasSize = "closed" | "half" | "full";
+
 export interface Question {
   id: string;
   text: string;
   items: CanvasItem[];
   figureOpen: boolean;
+  canvasSize: CanvasSize;
   options: Option[];
   labelStyle: LabelStyle;
   solution: string;
@@ -70,6 +73,8 @@ interface State {
   removeOption: (id: string) => void;
   clearOptions: () => void;
   toggleFigure: () => void;
+  cycleCanvasSize: () => void;
+  shrinkCanvas: () => void;
   addItem: (kind: ShapeKind, label?: string) => void;
   updateItem: (id: string, patch: Partial<CanvasItem>) => void;
   removeItem: (id: string) => void;
@@ -88,6 +93,7 @@ const blankQuestion = (): Question => ({
   text: "",
   items: [],
   figureOpen: false,
+  canvasSize: "closed",
   labelStyle: "A",
   solution: "",
   options: [
@@ -156,6 +162,15 @@ export const useMcq = create<State>((set, get) => ({
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
   },
+  cycleCanvasSize: () => {
+    const q = get().questions.find((x) => x.id === get().currentId)!;
+    const order: CanvasSize[] = ["closed", "half", "full"];
+    const next = order[(order.indexOf(q.canvasSize) + 1) % order.length];
+    get().updateCurrent({ canvasSize: next, figureOpen: next !== "closed" });
+  },
+  shrinkCanvas: () => {
+    get().updateCurrent({ canvasSize: "closed", figureOpen: false });
+  },
   addItem: (kind, label) => {
     const isText = kind === "text";
     const item: CanvasItem = {
@@ -169,7 +184,9 @@ export const useMcq = create<State>((set, get) => ({
     };
     set((s) => ({
       questions: s.questions.map((q) =>
-        q.id === s.currentId ? { ...q, items: [...q.items, item], figureOpen: true } : q,
+        q.id === s.currentId
+          ? { ...q, items: [...q.items, item], figureOpen: true, canvasSize: q.canvasSize === "closed" ? "half" : q.canvasSize }
+          : q,
       ),
       selectedItemId: item.id,
       shapePickerOpen: false,

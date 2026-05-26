@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { useMcq } from "@/lib/mcq-store";
+import { useMcq, LABEL_STYLES, type Question } from "@/lib/mcq-store";
 import { motion } from "framer-motion";
 
 export function SlideStrip() {
@@ -12,44 +12,31 @@ export function SlideStrip() {
   };
 
   return (
-    <div className="px-2 pt-3 pb-3 bg-background">
+    <div className="px-2 pt-2 pb-2 bg-background border-t border-border/60">
       <div className="flex items-center gap-2">
         <button
           onClick={() => go(-1)}
           disabled={idx === 0}
-          className="size-9 rounded-lg bg-card grid place-items-center disabled:opacity-30 border border-border"
+          className="size-8 rounded-md bg-card grid place-items-center disabled:opacity-30 border border-border shrink-0"
         >
           <ChevronLeft className="size-4" />
         </button>
 
         <div className="flex-1 overflow-x-auto no-scrollbar">
-          <div className="flex items-center justify-center gap-3 px-1 min-w-min mx-auto w-fit">
-            {questions.map((q, i) => {
-              const active = q.id === currentId;
-              return (
-                <motion.button
-                  key={q.id}
-                  layout
-                  onClick={() => setCurrent(q.id)}
-                  className={`relative shrink-0 rounded-lg w-16 h-12 text-[10px] font-medium text-canvas-foreground/70 transition ${
-                    active
-                      ? "ring-2 ring-primary shadow-pop"
-                      : "ring-1 ring-border"
-                  }`}
-                  style={{ backgroundColor: "var(--color-canvas)" }}
-                >
-                  <span className="absolute bottom-1 left-1.5">{i + 1}</span>
-                  {q.text && (
-                    <span className="absolute top-1 left-1.5 right-1.5 text-left truncate text-canvas-foreground/50">
-                      {q.text.slice(0, 8)}
-                    </span>
-                  )}
-                </motion.button>
-              );
-            })}
+          <div className="flex items-stretch gap-2 px-1 w-fit mx-auto">
+            {questions.map((q, i) => (
+              <SlideThumb
+                key={q.id}
+                q={q}
+                index={i}
+                active={q.id === currentId}
+                onClick={() => setCurrent(q.id)}
+              />
+            ))}
             <button
               onClick={addQuestion}
-              className="shrink-0 size-12 rounded-lg border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary/50 grid place-items-center"
+              className="shrink-0 w-[88px] h-[60px] rounded-md border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary/50 grid place-items-center self-center"
+              aria-label="Add slide"
             >
               <Plus className="size-4" />
             </button>
@@ -59,11 +46,72 @@ export function SlideStrip() {
         <button
           onClick={() => go(1)}
           disabled={idx === questions.length - 1}
-          className="size-9 rounded-lg bg-card grid place-items-center disabled:opacity-30 border border-border"
+          className="size-8 rounded-md bg-card grid place-items-center disabled:opacity-30 border border-border shrink-0"
         >
           <ChevronRight className="size-4" />
         </button>
       </div>
+    </div>
+  );
+}
+
+function SlideThumb({
+  q,
+  index,
+  active,
+  onClick,
+}: {
+  q: Question;
+  index: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const renderLabel = LABEL_STYLES.find((s) => s.id === q.labelStyle)!.render;
+  return (
+    <div className="flex items-center gap-1.5 shrink-0">
+      <span
+        className={`text-[10px] font-medium tabular-nums ${
+          active ? "text-primary" : "text-muted-foreground"
+        }`}
+      >
+        {index + 1}
+      </span>
+      <motion.button
+        layout
+        onClick={onClick}
+        className={`relative w-[88px] h-[60px] rounded-md overflow-hidden text-left transition ${
+          active
+            ? "ring-2 ring-primary shadow-pop"
+            : "ring-1 ring-border hover:ring-foreground/30"
+        }`}
+        style={{ backgroundColor: "var(--color-canvas)" }}
+      >
+        <div className="absolute inset-0 p-1.5 flex flex-col gap-0.5">
+          <div className="text-canvas-foreground text-[6px] leading-[1.15] font-medium line-clamp-2 min-h-[12px]">
+            {q.text || (
+              <span className="text-canvas-foreground/40">Untitled</span>
+            )}
+          </div>
+          <div className="flex-1 flex flex-col gap-[1px] justify-end">
+            {q.options.slice(0, 4).map((o, i) => (
+              <div key={o.id} className="flex items-center gap-0.5">
+                <span
+                  className={`text-[5px] font-semibold leading-none w-[7px] h-[7px] grid place-items-center rounded-[2px] ${
+                    o.correct
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-canvas-foreground/10 text-canvas-foreground/70"
+                  }`}
+                >
+                  {renderLabel(i)}
+                </span>
+                <span className="text-canvas-foreground/70 text-[5px] leading-none truncate flex-1">
+                  {o.text || "—"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.button>
     </div>
   );
 }
