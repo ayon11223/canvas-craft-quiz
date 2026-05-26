@@ -184,7 +184,9 @@ export const useMcq = create<State>((set, get) => ({
     };
     set((s) => ({
       questions: s.questions.map((q) =>
-        q.id === s.currentId ? { ...q, items: [...q.items, item], figureOpen: true } : q,
+        q.id === s.currentId
+          ? { ...q, items: [...q.items, item], figureOpen: true, canvasSize: q.canvasSize === "closed" ? "half" : q.canvasSize }
+          : q,
       ),
       selectedItemId: item.id,
       shapePickerOpen: false,
