@@ -168,7 +168,36 @@ export const useMcq = create<State>((set, get) => ({
           : q,
       ),
     })),
-  toggleFigure: () => {
+  shuffleOptions: () =>
+    set((s) => ({
+      questions: s.questions.map((q) => {
+        if (q.id !== s.currentId) return q;
+        const arr = [...q.options];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return { ...q, options: arr };
+      }),
+    })),
+  autoFillOptions: () => {
+    const samples = ["Lorem ipsum", "Dolor sit amet", "Consectetur", "Adipiscing elit", "Sed do eiusmod", "Tempor incididunt"];
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId
+          ? {
+              ...q,
+              options: q.options.map((o, i) => ({
+                ...o,
+                text: samples[i % samples.length],
+                correct: i === 0,
+              })),
+            }
+          : q,
+      ),
+    }));
+  },
+
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
   },
