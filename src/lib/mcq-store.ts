@@ -162,6 +162,15 @@ export const useMcq = create<State>((set, get) => ({
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
   },
+  cycleCanvasSize: () => {
+    const q = get().questions.find((x) => x.id === get().currentId)!;
+    const order: CanvasSize[] = ["closed", "half", "full"];
+    const next = order[(order.indexOf(q.canvasSize) + 1) % order.length];
+    get().updateCurrent({ canvasSize: next, figureOpen: next !== "closed" });
+  },
+  shrinkCanvas: () => {
+    get().updateCurrent({ canvasSize: "closed", figureOpen: false });
+  },
   addItem: (kind, label) => {
     const isText = kind === "text";
     const item: CanvasItem = {
