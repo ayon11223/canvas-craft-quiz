@@ -73,6 +73,8 @@ interface State {
   removeOption: (id: string) => void;
   clearOptions: () => void;
   toggleFigure: () => void;
+  cycleCanvasSize: () => void;
+  shrinkCanvas: () => void;
   addItem: (kind: ShapeKind, label?: string) => void;
   updateItem: (id: string, patch: Partial<CanvasItem>) => void;
   removeItem: (id: string) => void;
@@ -91,6 +93,7 @@ const blankQuestion = (): Question => ({
   text: "",
   items: [],
   figureOpen: false,
+  canvasSize: "closed",
   labelStyle: "A",
   solution: "",
   options: [
