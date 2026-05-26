@@ -197,7 +197,7 @@ export const useMcq = create<State>((set, get) => ({
       ),
     }));
   },
-
+  toggleFigure: () => {
     const q = get().questions.find((x) => x.id === get().currentId)!;
     get().updateCurrent({ figureOpen: !q.figureOpen });
   },
