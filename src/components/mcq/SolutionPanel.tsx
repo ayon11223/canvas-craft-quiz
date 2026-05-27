@@ -1,4 +1,4 @@
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Minus } from "lucide-react";
 import { useCurrentQuestion, useMcq } from "@/lib/mcq-store";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,10 +17,14 @@ export function SolutionPanel() {
 
       <button
         onClick={() => setSolutionOpen(!solutionOpen)}
-        className="w-full flex items-center justify-center gap-2 text-sm font-medium py-3 rounded-xl border-2 border-dashed border-border hover:border-primary/60 hover:bg-card transition"
+        className={`w-full flex items-center justify-center gap-2 text-sm font-medium py-3 rounded-xl border-2 border-dashed transition ${
+          solutionOpen
+            ? "border-primary/60 bg-card text-foreground"
+            : "border-border hover:border-primary/60 hover:bg-card"
+        }`}
       >
-        <Plus className="size-4" />
-        Add Solution / Explanation
+        {solutionOpen ? <Minus className="size-4" /> : <Plus className="size-4" />}
+        {solutionOpen ? "Hide Solution" : "Add Solution / Explanation"}
       </button>
 
       <AnimatePresence>

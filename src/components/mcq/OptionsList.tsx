@@ -99,7 +99,7 @@ function SortableOption({
   labelHandlers: ReturnType<typeof useLongPress>;
   tickStyle: "label" | "green" | "side";
 }) {
-  const { setOption, removeOption } = useMcq();
+  const { setOption } = useMcq();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: option.id,
   });
@@ -107,6 +107,8 @@ function SortableOption({
   const showCheckInLabel = tickStyle === "label" && option.correct;
   const greenRow = tickStyle === "green" && option.correct;
   const sideTick = tickStyle === "side" && option.correct;
+
+  const clearThis = () => setOption(option.id, { text: "", correct: false });
 
   return (
     <div
@@ -145,20 +147,25 @@ function SortableOption({
         value={option.text}
         onChange={(e) => setOption(option.id, { text: e.target.value })}
         placeholder={`Option ${label}`}
-        className="flex-1 bg-transparent text-sm py-3 outline-none placeholder:text-muted-foreground/60"
+        className="flex-1 min-w-0 bg-transparent text-sm py-3 outline-none placeholder:text-muted-foreground/60"
       />
-      {sideTick && (
-        <span className="size-5 rounded-full bg-emerald-500 grid place-items-center shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
+        <span
+          className={`size-5 rounded-full grid place-items-center transition ${
+            sideTick ? "bg-emerald-500 opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          aria-hidden={!sideTick}
+        >
           <Check className="size-3 text-white" />
         </span>
-      )}
-      <button
-        onClick={() => removeOption(option.id)}
-        className="p-2 text-muted-foreground/60 hover:text-destructive transition"
-        aria-label="Remove option"
-      >
-        <Trash2 className="size-4" />
-      </button>
+        <button
+          onClick={clearThis}
+          className="p-2 text-muted-foreground/60 hover:text-destructive transition"
+          aria-label="Clear option"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </div>
     </div>
   );
 }
