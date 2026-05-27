@@ -99,18 +99,29 @@ export function OptionsSettings() {
             onClick={close}
           />
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl shadow-pop pb-[env(safe-area-inset-bottom)]"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl shadow-pop pb-[env(safe-area-inset-bottom)] max-h-[85vh] flex flex-col"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 32 }}
           >
-            <div className="mx-auto mt-2 mb-1 h-1.5 w-12 rounded-full bg-muted-foreground/30" />
-            <div className="px-5 pt-3 pb-5">
-              <h3 className="font-display font-semibold text-base">Choice settings</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Configure how this question's answers look and behave.
-              </p>
+            <div className="mx-auto mt-2 mb-1 h-1.5 w-12 rounded-full bg-muted-foreground/30 shrink-0" />
+            <div className="px-5 pt-2 pb-5 overflow-y-auto">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-display font-semibold text-base">Choice settings</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Configure how this question's answers look and behave.
+                  </p>
+                </div>
+                <button
+                  onClick={close}
+                  aria-label="Close"
+                  className="size-9 -mt-1 -mr-1 rounded-full grid place-items-center text-muted-foreground hover:text-foreground hover:bg-secondary shrink-0"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
               <div className="mt-4 space-y-1.5">
                 {items.map((it) => (
                   <div key={it.label}>
