@@ -1,4 +1,4 @@
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Minus } from "lucide-react";
 import { useCurrentQuestion, useMcq } from "@/lib/mcq-store";
 import { motion, AnimatePresence } from "framer-motion";
 
