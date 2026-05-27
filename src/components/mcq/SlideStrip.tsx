@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useMcq, LABEL_STYLES, type Question } from "@/lib/mcq-store";
+import { Shape } from "./Shape";
 import { motion } from "framer-motion";
 
 export function SlideStrip() {
