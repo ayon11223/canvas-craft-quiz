@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   ChevronRight,
   Check,
+  X,
 } from "lucide-react";
 import { useCurrentQuestion, useMcq, type TickStyle } from "@/lib/mcq-store";
 
