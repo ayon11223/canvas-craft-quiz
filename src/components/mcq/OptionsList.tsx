@@ -160,8 +160,11 @@ function SortableOption({
         </span>
         <button
           onClick={clearThis}
-          className="p-2 text-muted-foreground/60 hover:text-destructive transition"
+          className={`p-2 text-muted-foreground/60 hover:text-destructive transition ${
+            option.text ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
           aria-label="Clear option"
+          tabIndex={option.text ? 0 : -1}
         >
           <Trash2 className="size-4" />
         </button>
