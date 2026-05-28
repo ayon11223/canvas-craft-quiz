@@ -124,8 +124,11 @@ function DraggableItem({
   containerRef: React.RefObject<HTMLDivElement | null>;
   selected: boolean;
 }) {
-  const { updateItem, selectItem, removeItem } = useMcq();
+  const { updateItem, updateItemCell, selectItem, removeItem } = useMcq();
   const isText = item.kind === "text";
+  const isImage = item.kind === "image";
+  const isTable = item.kind === "table" || item.kind === "matrix";
+  const isMatrix = item.kind === "matrix";
   const [editing, setEditing] = useState(false);
   const draggedRef = useRef(false);
 
@@ -168,6 +171,7 @@ function DraggableItem({
 
   return (
     <motion.div
+      data-canvas-item
       initial={{ scale: 0.6, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.6, opacity: 0 }}
@@ -182,6 +186,7 @@ function DraggableItem({
       }}
       onPointerDown={(e) => {
         if (isText && editing) return;
+        if (isTable && selected) return;
         startDrag(e, "move");
       }}
       onDoubleClick={() => {
@@ -212,6 +217,17 @@ function DraggableItem({
               {item.label?.trim() ? item.label : <span className="text-canvas-foreground/40">Double-tap to edit</span>}
             </div>
           )
+        ) : isImage ? (
+          <div className="w-full h-full rounded-md bg-canvas-foreground/10 border border-dashed border-canvas-foreground/30 grid place-items-center text-canvas-foreground/50 text-[11px]">
+            🖼 Image
+          </div>
+        ) : isTable ? (
+          <TableGrid
+            item={item}
+            isMatrix={isMatrix}
+            onCellChange={(r, c, v) => updateItemCell(item.id, r, c, v)}
+            interactive={selected}
+          />
         ) : (
           <Shape
             kind={item.kind}
@@ -235,10 +251,68 @@ function DraggableItem({
               className="absolute -bottom-2 -right-2 size-5 rounded-full bg-primary border-2 border-canvas cursor-se-resize"
               style={{ touchAction: "none" }}
             />
+            {isTable && (
+              <div
+                onPointerDown={(e) => startDrag(e, "move")}
+                className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[9px] font-medium shadow-pop cursor-move"
+                style={{ touchAction: "none" }}
+              >
+                drag
+              </div>
+            )}
           </>
         )}
       </div>
     </motion.div>
+  );
+}
+
+function TableGrid({
+  item,
+  isMatrix,
+  onCellChange,
+  interactive,
+}: {
+  item: CanvasItem;
+  isMatrix: boolean;
+  onCellChange: (r: number, c: number, v: string) => void;
+  interactive: boolean;
+}) {
+  const rows = item.rows ?? item.data?.length ?? 1;
+  const cols = item.cols ?? item.data?.[0]?.length ?? 1;
+  const bracket = isMatrix ? "border-l-2 border-r-2 border-canvas-foreground/80 mx-1.5" : "";
+
+  return (
+    <div className={`w-full h-full flex ${isMatrix ? "items-stretch" : ""}`}>
+      {isMatrix && <div className="w-1 border-l-2 border-y-2 border-canvas-foreground/80 rounded-l-sm" />}
+      <div
+        className={`flex-1 grid ${isMatrix ? "" : "border border-canvas-foreground/40 rounded-sm overflow-hidden"} ${bracket}`}
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+        }}
+      >
+        {Array.from({ length: rows }).map((_, r) =>
+          Array.from({ length: cols }).map((_, c) => (
+            <input
+              key={`${r}-${c}`}
+              value={item.data?.[r]?.[c] ?? ""}
+              onChange={(e) => onCellChange(r, c, e.target.value)}
+              onPointerDown={(e) => {
+                if (interactive) e.stopPropagation();
+              }}
+              placeholder={isMatrix ? "0" : ""}
+              readOnly={!interactive}
+              className={`min-w-0 bg-transparent text-canvas-foreground text-[11px] text-center outline-none px-0.5 ${
+                isMatrix ? "" : "border border-canvas-foreground/15"
+              }`}
+              style={{ touchAction: interactive ? "auto" : "none" }}
+            />
+          )),
+        )}
+      </div>
+      {isMatrix && <div className="w-1 border-r-2 border-y-2 border-canvas-foreground/80 rounded-r-sm" />}
+    </div>
   );
 }
 

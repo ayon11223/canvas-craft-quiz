@@ -25,17 +25,24 @@ export type ShapeKind =
   | "axis"
   | "line"
   | "equation"
-  | "text";
+  | "text"
+  | "image"
+  | "table"
+  | "matrix"
+  | "chart";
 
 export interface CanvasItem {
   id: string;
   kind: ShapeKind;
-  x: number; // 0..1
-  y: number; // 0..1
-  w: number; // 0..1
-  h: number; // 0..1
+  x: number;
+  y: number;
+  w: number;
+  h: number;
   label?: string;
   rotation?: number;
+  rows?: number;
+  cols?: number;
+  data?: string[][];
 }
 
 export interface Option {
@@ -45,7 +52,6 @@ export interface Option {
 }
 
 export type CanvasSize = "closed" | "half" | "full";
-
 export type TickStyle = "label" | "green" | "side";
 
 export interface Question {
@@ -60,6 +66,8 @@ export interface Question {
   solution: string;
 }
 
+export type TableMode = "table" | "matrix";
+
 interface State {
   questions: Question[];
   currentId: string;
@@ -68,8 +76,11 @@ interface State {
   solutionOpen: boolean;
   labelPickerOpen: boolean;
   optionsSettingsOpen: boolean;
+  insertMenuOpen: boolean;
+  tableDialog: { mode: TableMode } | null;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
+  reorderQuestions: (ids: string[]) => void;
   updateCurrent: (patch: Partial<Question>) => void;
   setOption: (id: string, patch: Partial<Option>) => void;
   reorderOptions: (ids: string[]) => void;
@@ -82,13 +93,17 @@ interface State {
   cycleCanvasSize: () => void;
   shrinkCanvas: () => void;
   addItem: (kind: ShapeKind, label?: string) => void;
+  addTable: (rows: number, cols: number, mode: TableMode) => void;
   updateItem: (id: string, patch: Partial<CanvasItem>) => void;
+  updateItemCell: (id: string, r: number, c: number, value: string) => void;
   removeItem: (id: string) => void;
   selectItem: (id: string | null) => void;
   setShapePicker: (v: boolean) => void;
   setSolutionOpen: (v: boolean) => void;
   setLabelPickerOpen: (v: boolean) => void;
   setOptionsSettingsOpen: (v: boolean) => void;
+  setInsertMenuOpen: (v: boolean) => void;
+  setTableDialog: (v: { mode: TableMode } | null) => void;
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
@@ -123,11 +138,17 @@ export const useMcq = create<State>((set, get) => ({
   solutionOpen: false,
   labelPickerOpen: false,
   optionsSettingsOpen: false,
+  insertMenuOpen: false,
+  tableDialog: null,
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     const q = blankQuestion();
     set((s) => ({ questions: [...s.questions, q], currentId: q.id }));
   },
+  reorderQuestions: (ids) =>
+    set((s) => ({
+      questions: ids.map((id) => s.questions.find((q) => q.id === id)!).filter(Boolean),
+    })),
   updateCurrent: (patch) =>
     set((s) => ({
       questions: s.questions.map((q) => (q.id === s.currentId ? { ...q, ...patch } : q)),
@@ -212,13 +233,14 @@ export const useMcq = create<State>((set, get) => ({
   },
   addItem: (kind, label) => {
     const isText = kind === "text";
+    const isImage = kind === "image";
     const item: CanvasItem = {
       id: uid(),
       kind,
-      x: isText ? 0.15 : 0.3,
-      y: isText ? 0.1 : 0.3,
-      w: isText ? 0.6 : 0.35,
-      h: isText ? 0.12 : 0.35,
+      x: isText ? 0.15 : 0.25,
+      y: isText ? 0.1 : 0.2,
+      w: isText ? 0.6 : isImage ? 0.5 : 0.35,
+      h: isText ? 0.12 : isImage ? 0.45 : 0.35,
       label: isText ? (label ?? "Text") : label,
     };
     set((s) => ({
@@ -229,6 +251,31 @@ export const useMcq = create<State>((set, get) => ({
       ),
       selectedItemId: item.id,
       shapePickerOpen: false,
+      insertMenuOpen: false,
+    }));
+  },
+  addTable: (rows, cols, mode) => {
+    const data = Array.from({ length: rows }, () => Array.from({ length: cols }, () => ""));
+    const item: CanvasItem = {
+      id: uid(),
+      kind: mode,
+      x: 0.1,
+      y: 0.15,
+      w: Math.min(0.8, 0.18 * cols + 0.1),
+      h: Math.min(0.7, 0.12 * rows + 0.08),
+      rows,
+      cols,
+      data,
+    };
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId
+          ? { ...q, items: [...q.items, item], figureOpen: true, canvasSize: q.canvasSize === "closed" ? "half" : q.canvasSize }
+          : q,
+      ),
+      selectedItemId: item.id,
+      insertMenuOpen: false,
+      tableDialog: null,
     }));
   },
   updateItem: (id, patch) =>
@@ -236,6 +283,22 @@ export const useMcq = create<State>((set, get) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, items: q.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) }
+          : q,
+      ),
+    })),
+  updateItemCell: (id, r, c, value) =>
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId
+          ? {
+              ...q,
+              items: q.items.map((it) => {
+                if (it.id !== id || !it.data) return it;
+                const data = it.data.map((row) => row.slice());
+                data[r][c] = value;
+                return { ...it, data };
+              }),
+            }
           : q,
       ),
     })),
@@ -251,6 +314,8 @@ export const useMcq = create<State>((set, get) => ({
   setSolutionOpen: (v) => set({ solutionOpen: v }),
   setLabelPickerOpen: (v) => set({ labelPickerOpen: v }),
   setOptionsSettingsOpen: (v) => set({ optionsSettingsOpen: v }),
+  setInsertMenuOpen: (v) => set({ insertMenuOpen: v }),
+  setTableDialog: (v) => set({ tableDialog: v }),
   setLabelStyle: (s) => get().updateCurrent({ labelStyle: s }),
   setTickStyle: (s) => get().updateCurrent({ tickStyle: s }),
   setSolution: (s) => get().updateCurrent({ solution: s }),

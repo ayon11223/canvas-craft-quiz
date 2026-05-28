@@ -1,19 +1,52 @@
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, GripHorizontal } from "lucide-react";
 import { useMcq, LABEL_STYLES, type Question } from "@/lib/mcq-store";
 import { Shape } from "./Shape";
 import { motion } from "framer-motion";
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export function SlideStrip() {
-  const { questions, currentId, setCurrent, addQuestion } = useMcq();
+  const { questions, currentId, setCurrent, addQuestion, reorderQuestions } = useMcq();
   const idx = questions.findIndex((q) => q.id === currentId);
+
+  // Long-press to start drag: TouchSensor delay + PointerSensor delay for mouse.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 6 } }),
+  );
 
   const go = (d: number) => {
     const next = idx + d;
     if (next >= 0 && next < questions.length) setCurrent(questions[next].id);
   };
 
+  const onDragEnd = (e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    const ids = questions.map((q) => q.id);
+    const next = arrayMove(
+      ids,
+      ids.indexOf(String(e.active.id)),
+      ids.indexOf(String(e.over.id)),
+    );
+    reorderQuestions(next);
+  };
+
   return (
-    <div className="px-2 pt-2 pb-2 bg-background border-t border-border/60">
+    <div className="px-2 pt-2 pb-2 bg-background border-t border-border/60" data-no-swipe>
       <div className="flex items-center gap-2">
         <button
           onClick={() => go(-1)}
@@ -24,24 +57,31 @@ export function SlideStrip() {
         </button>
 
         <div className="flex-1 overflow-x-auto no-scrollbar">
-          <div className="flex items-stretch gap-2 px-1 w-fit mx-auto">
-            {questions.map((q, i) => (
-              <SlideThumb
-                key={q.id}
-                q={q}
-                index={i}
-                active={q.id === currentId}
-                onClick={() => setCurrent(q.id)}
-              />
-            ))}
-            <button
-              onClick={addQuestion}
-              className="shrink-0 w-[88px] h-[60px] rounded-md border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary/50 grid place-items-center self-center"
-              aria-label="Add slide"
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext
+              items={questions.map((q) => q.id)}
+              strategy={horizontalListSortingStrategy}
             >
-              <Plus className="size-4" />
-            </button>
-          </div>
+              <div className="flex items-stretch gap-2 px-1 w-fit mx-auto">
+                {questions.map((q, i) => (
+                  <SlideThumb
+                    key={q.id}
+                    q={q}
+                    index={i}
+                    active={q.id === currentId}
+                    onClick={() => setCurrent(q.id)}
+                  />
+                ))}
+                <button
+                  onClick={addQuestion}
+                  className="shrink-0 w-[88px] h-[60px] rounded-md border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary/50 grid place-items-center self-center"
+                  aria-label="Add slide"
+                >
+                  <Plus className="size-4" />
+                </button>
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         <button
@@ -52,6 +92,9 @@ export function SlideStrip() {
           <ChevronRight className="size-4" />
         </button>
       </div>
+      <p className="mt-1 text-center text-[9px] text-muted-foreground/60">
+        Long-press a slide to reorder
+      </p>
     </div>
   );
 }
@@ -68,8 +111,20 @@ function SlideThumb({
   onClick: () => void;
 }) {
   const renderLabel = LABEL_STYLES.find((s) => s.id === q.labelStyle)!.render;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: q.id,
+  });
+
   return (
-    <div className="flex items-center gap-1.5 shrink-0">
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : "auto",
+      }}
+      className="flex items-center gap-1.5 shrink-0"
+    >
       <span
         className={`text-[10px] font-medium tabular-nums ${
           active ? "text-primary" : "text-muted-foreground"
@@ -80,13 +135,20 @@ function SlideThumb({
       <motion.button
         layout
         onClick={onClick}
-        className={`relative w-[88px] h-[60px] rounded-md overflow-hidden text-left transition ${
+        {...attributes}
+        {...listeners}
+        className={`relative w-[88px] h-[60px] rounded-md overflow-hidden text-left transition touch-none ${
           active
             ? "ring-2 ring-primary shadow-pop"
             : "ring-1 ring-border hover:ring-foreground/30"
-        }`}
+        } ${isDragging ? "shadow-pop ring-2 ring-primary scale-105" : ""}`}
         style={{ backgroundColor: "var(--color-canvas)" }}
       >
+        {isDragging && (
+          <div className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground rounded-sm p-0.5 z-10">
+            <GripHorizontal className="size-2.5" />
+          </div>
+        )}
         <div className="absolute inset-0 p-1.5 flex flex-col gap-0.5">
           <div className="text-canvas-foreground text-[6px] leading-[1.15] font-medium line-clamp-2 min-h-[12px]">
             {q.text || (
@@ -110,6 +172,10 @@ function SlideThumb({
                     <div className="w-full h-full text-canvas-foreground/80 text-[4px] leading-none truncate">
                       {it.label || "T"}
                     </div>
+                  ) : it.kind === "image" ? (
+                    <div className="w-full h-full bg-canvas-foreground/15 rounded-[1px]" />
+                  ) : it.kind === "table" || it.kind === "matrix" ? (
+                    <div className="w-full h-full border border-canvas-foreground/40 rounded-[1px] bg-canvas-foreground/5" />
                   ) : (
                     <Shape kind={it.kind} className="w-full h-full" />
                   )}
