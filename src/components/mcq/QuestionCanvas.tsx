@@ -304,7 +304,7 @@ function TableGrid({
               placeholder={isMatrix ? "0" : ""}
               readOnly={!interactive}
               className={`min-w-0 bg-transparent text-canvas-foreground text-[11px] text-center outline-none px-0.5 ${
-                isMatrix ? "" : "border-r border-b border-canvas-foreground/20 [&:nth-child(" + cols + "n)]:border-r-0"
+                isMatrix ? "" : "border border-canvas-foreground/15"
               }`}
               style={{ touchAction: interactive ? "auto" : "none" }}
             />
