@@ -101,6 +101,7 @@ function SortableOption({
   tickStyle: "label" | "green" | "side" | "none";
 }) {
   const { setOption } = useMcq();
+  const [focused, setFocused] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: option.id,
   });
