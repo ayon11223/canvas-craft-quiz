@@ -64,6 +64,7 @@ export interface Question {
   labelStyle: LabelStyle;
   tickStyle: TickStyle;
   solution: string;
+  footer: string;
 }
 
 export type TableMode = "table" | "matrix";
