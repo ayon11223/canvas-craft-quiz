@@ -1,7 +1,7 @@
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2, Check, Shuffle, Type, Settings2, Lock } from "lucide-react";
+import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock } from "lucide-react";
 import { LABEL_STYLES, useCurrentQuestion, useMcq, type Option } from "@/lib/mcq-store";
 import { useLongPress } from "@/hooks/use-long-press";
 
