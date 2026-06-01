@@ -8,7 +8,7 @@ import { useLongPress } from "@/hooks/use-long-press";
 
 export function OptionsList() {
   const q = useCurrentQuestion();
-  const { reorderOptions, setLabelPickerOpen, shuffleOptions, autoFillOptions, setOptionsSettingsOpen } = useMcq();
+  const { reorderOptions, setLabelPickerOpen, shuffleOptions, autoFillOptions, setOptionsSettingsOpen, clearOptions } = useMcq();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const renderLabel = LABEL_STYLES.find((s) => s.id === q.labelStyle)!.render;
 
