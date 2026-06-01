@@ -121,6 +121,7 @@ const blankQuestion = (): Question => ({
   labelStyle: "A",
   tickStyle: "label",
   solution: "",
+  footer: "",
   options: [
     { id: uid(), text: "" },
     { id: uid(), text: "" },
