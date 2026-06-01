@@ -148,6 +148,8 @@ function SortableOption({
       <input
         value={option.text}
         onChange={(e) => setOption(option.id, { text: e.target.value })}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         placeholder={`Option ${label}`}
         className="flex-1 min-w-0 bg-transparent text-sm py-3 outline-none placeholder:text-muted-foreground/60"
       />
@@ -161,12 +163,13 @@ function SortableOption({
           <Check className="size-3 text-white" />
         </span>
         <button
+          onMouseDown={(e) => e.preventDefault()}
           onClick={clearThis}
           className={`p-2 text-muted-foreground/60 hover:text-destructive transition ${
-            option.text ? "opacity-100" : "opacity-0 pointer-events-none"
+            focused && option.text ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
           aria-label="Clear option"
-          tabIndex={option.text ? 0 : -1}
+          tabIndex={focused && option.text ? 0 : -1}
         >
           <Trash2 className="size-4" />
         </button>
