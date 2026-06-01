@@ -35,7 +35,7 @@ export function QuestionCanvas() {
           )}
         </div>
 
-        {q.canvasSize === "full" && (
+        {open && (
           <div
             data-no-swipe
             className="absolute bottom-7 left-3 right-3"
