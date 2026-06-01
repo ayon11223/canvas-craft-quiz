@@ -35,7 +35,22 @@ export function QuestionCanvas() {
           )}
         </div>
 
+        {q.canvasSize === "full" && (
+          <div
+            data-no-swipe
+            className="absolute bottom-7 left-3 right-3"
+          >
+            <input
+              value={q.footer ?? ""}
+              onChange={(e) => updateCurrent({ footer: e.target.value })}
+              placeholder="Footer / note (e.g. Source, Marks: 2)…"
+              className="w-full bg-transparent border-t border-canvas-foreground/15 pt-1.5 text-[11px] text-canvas-foreground/80 outline-none placeholder:text-canvas-foreground/40"
+            />
+          </div>
+        )}
+
         <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-2">
+
           <button
             onClick={cycleCanvasSize}
             className="flex items-center gap-1 text-[11px] text-canvas-foreground/70 hover:text-canvas-foreground px-2 py-0.5 rounded-full hover:bg-canvas-foreground/5"
