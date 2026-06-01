@@ -64,6 +64,7 @@ export interface Question {
   labelStyle: LabelStyle;
   tickStyle: TickStyle;
   solution: string;
+  footer: string;
 }
 
 export type TableMode = "table" | "matrix";
@@ -120,6 +121,7 @@ const blankQuestion = (): Question => ({
   labelStyle: "A",
   tickStyle: "label",
   solution: "",
+  footer: "",
   options: [
     { id: uid(), text: "" },
     { id: uid(), text: "" },
