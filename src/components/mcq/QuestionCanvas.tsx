@@ -95,7 +95,7 @@ function numberOf(id: string) {
 
 function FigureArea() {
   const q = useCurrentQuestion();
-  const { selectedItemId, selectItem } = useMcq();
+  const { selectedItemId, selectItem, updateCurrent } = useMcq();
   const ref = useRef<HTMLDivElement>(null);
 
   return (
