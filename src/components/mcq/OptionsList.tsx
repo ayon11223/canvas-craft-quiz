@@ -34,6 +34,9 @@ export function OptionsList() {
           <IconBtn label="Shuffle" onClick={shuffleOptions}>
             <Shuffle className="size-4" />
           </IconBtn>
+          <IconBtn label="Clear all choices" onClick={clearOptions}>
+            <Eraser className="size-4" />
+          </IconBtn>
           <IconBtn label="Choice settings" onClick={() => setOptionsSettingsOpen(true)} accent>
             <Settings2 className="size-4" />
           </IconBtn>
