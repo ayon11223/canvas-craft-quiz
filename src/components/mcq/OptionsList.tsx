@@ -1,13 +1,14 @@
+import { useState } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock } from "lucide-react";
+import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock, Eraser } from "lucide-react";
 import { LABEL_STYLES, useCurrentQuestion, useMcq, type Option } from "@/lib/mcq-store";
 import { useLongPress } from "@/hooks/use-long-press";
 
 export function OptionsList() {
   const q = useCurrentQuestion();
-  const { reorderOptions, setLabelPickerOpen, shuffleOptions, autoFillOptions, setOptionsSettingsOpen } = useMcq();
+  const { reorderOptions, setLabelPickerOpen, shuffleOptions, autoFillOptions, setOptionsSettingsOpen, clearOptions } = useMcq();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const renderLabel = LABEL_STYLES.find((s) => s.id === q.labelStyle)!.render;
 
@@ -32,6 +33,9 @@ export function OptionsList() {
         <div className="flex items-center gap-1">
           <IconBtn label="Shuffle" onClick={shuffleOptions}>
             <Shuffle className="size-4" />
+          </IconBtn>
+          <IconBtn label="Clear all choices" onClick={clearOptions}>
+            <Eraser className="size-4" />
           </IconBtn>
           <IconBtn label="Choice settings" onClick={() => setOptionsSettingsOpen(true)} accent>
             <Settings2 className="size-4" />
@@ -94,9 +98,10 @@ function SortableOption({
   option: Option;
   label: string;
   labelHandlers: ReturnType<typeof useLongPress>;
-  tickStyle: "label" | "green" | "side";
+  tickStyle: "label" | "green" | "side" | "none";
 }) {
   const { setOption } = useMcq();
+  const [focused, setFocused] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: option.id,
   });
@@ -143,6 +148,8 @@ function SortableOption({
       <input
         value={option.text}
         onChange={(e) => setOption(option.id, { text: e.target.value })}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         placeholder={`Option ${label}`}
         className="flex-1 min-w-0 bg-transparent text-sm py-3 outline-none placeholder:text-muted-foreground/60"
       />
@@ -156,12 +163,13 @@ function SortableOption({
           <Check className="size-3 text-white" />
         </span>
         <button
+          onMouseDown={(e) => e.preventDefault()}
           onClick={clearThis}
           className={`p-2 text-muted-foreground/60 hover:text-destructive transition ${
-            option.text ? "opacity-100" : "opacity-0 pointer-events-none"
+            focused && option.text ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
           aria-label="Clear option"
-          tabIndex={option.text ? 0 : -1}
+          tabIndex={focused && option.text ? 0 : -1}
         >
           <Trash2 className="size-4" />
         </button>

@@ -15,6 +15,7 @@ import {
 import { useCurrentQuestion, useMcq, type TickStyle } from "@/lib/mcq-store";
 
 const TICK_OPTIONS: { id: TickStyle; name: string; desc: string }[] = [
+  { id: "none", name: "No tick (default)", desc: "Hide tick until solution is shown" },
   { id: "label", name: "On the label", desc: "Check mark replaces A · B · C" },
   { id: "green", name: "Highlight green", desc: "Whole option turns green" },
   { id: "side", name: "Side badge", desc: "Small tick on the right" },
