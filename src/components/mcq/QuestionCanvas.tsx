@@ -35,7 +35,7 @@ export function QuestionCanvas() {
           )}
         </div>
 
-        {q.canvasSize === "full" && (
+        {open && (
           <div
             data-no-swipe
             className="absolute bottom-7 left-3 right-3"
@@ -95,7 +95,7 @@ function numberOf(id: string) {
 
 function FigureArea() {
   const q = useCurrentQuestion();
-  const { selectedItemId, selectItem } = useMcq();
+  const { selectedItemId, selectItem, updateCurrent } = useMcq();
   const ref = useRef<HTMLDivElement>(null);
 
   return (
@@ -106,11 +106,13 @@ function FigureArea() {
         if (e.target === e.currentTarget) selectItem(null);
       }}
     >
-      {q.text && (
-        <div className="absolute top-0 left-0 right-0 text-[13px] text-canvas-foreground/80 pointer-events-none">
-          {q.text}
-        </div>
-      )}
+      <textarea
+        data-no-swipe
+        value={q.text}
+        onChange={(e) => updateCurrent({ text: e.target.value })}
+        placeholder="Type your question..."
+        className="absolute top-0 left-0 right-0 bg-transparent resize-none outline-none text-[13px] leading-snug text-canvas-foreground/90 placeholder:text-canvas-foreground/40 h-10"
+      />
       <AnimatePresence>
         {q.items.map((it) => (
           <DraggableItem
