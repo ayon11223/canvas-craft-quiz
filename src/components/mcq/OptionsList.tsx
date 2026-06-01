@@ -94,7 +94,7 @@ function SortableOption({
   option: Option;
   label: string;
   labelHandlers: ReturnType<typeof useLongPress>;
-  tickStyle: "label" | "green" | "side";
+  tickStyle: "label" | "green" | "side" | "none";
 }) {
   const { setOption } = useMcq();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
