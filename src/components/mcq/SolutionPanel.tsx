@@ -4,16 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function SolutionPanel() {
   const q = useCurrentQuestion();
-  const { setSolutionOpen, solutionOpen, setSolution, addOption } = useMcq();
+  const { setSolutionOpen, solutionOpen, setSolution } = useMcq();
 
   return (
     <div className="px-4 mt-3 space-y-3">
-      <button
-        onClick={addOption}
-        className="w-full text-xs text-muted-foreground py-2 rounded-lg border border-dashed border-border hover:border-primary/50 hover:text-foreground transition"
-      >
-        + Add another choice
-      </button>
+
 
       <button
         onClick={() => setSolutionOpen(!solutionOpen)}
