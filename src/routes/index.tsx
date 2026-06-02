@@ -94,6 +94,7 @@ function Editor() {
       <OptionsSettings />
       <InsertMenu />
       <TableDialog />
+      <EquationsPicker />
     </div>
   );
 }
