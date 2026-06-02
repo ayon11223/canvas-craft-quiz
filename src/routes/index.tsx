@@ -23,6 +23,10 @@ function Editor() {
   const { questions, currentId, setCurrent } = useMcq();
   const start = useRef<{ x: number; y: number; t: number; blocked: boolean } | null>(null);
 
+  useEffect(() => {
+    installLastFocusTracker();
+  }, []);
+
   const isBlocked = (target: EventTarget | null) => {
     const el = target as HTMLElement | null;
     if (!el) return false;
