@@ -46,14 +46,14 @@ export function SlideStrip() {
   };
 
   return (
-    <div className="px-2 pt-2 pb-2 bg-background border-t border-border/60" data-no-swipe>
-      <div className="flex items-center gap-2">
+    <div className="px-2 pt-1.5 pb-1.5 bg-background border-t border-border/60" data-no-swipe>
+      <div className="flex items-center gap-1.5">
         <button
           onClick={() => go(-1)}
           disabled={idx === 0}
-          className="size-8 rounded-md bg-card grid place-items-center disabled:opacity-30 border border-border shrink-0"
+          className="size-6 rounded-md bg-card grid place-items-center disabled:opacity-30 border border-border shrink-0"
         >
-          <ChevronLeft className="size-4" />
+          <ChevronLeft className="size-3.5" />
         </button>
 
         <div className="flex-1 overflow-x-auto no-scrollbar">
@@ -87,14 +87,11 @@ export function SlideStrip() {
         <button
           onClick={() => go(1)}
           disabled={idx === questions.length - 1}
-          className="size-8 rounded-md bg-card grid place-items-center disabled:opacity-30 border border-border shrink-0"
+          className="size-6 rounded-md bg-card grid place-items-center disabled:opacity-30 border border-border shrink-0"
         >
-          <ChevronRight className="size-4" />
+          <ChevronRight className="size-3.5" />
         </button>
       </div>
-      <p className="mt-1 text-center text-[9px] text-muted-foreground/60">
-        Long-press a slide to reorder
-      </p>
     </div>
   );
 }
