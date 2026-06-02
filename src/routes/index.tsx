@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { TopBar } from "@/components/mcq/TopBar";
 import { QuestionCanvas } from "@/components/mcq/QuestionCanvas";
 import { OptionsList } from "@/components/mcq/OptionsList";
@@ -11,7 +11,9 @@ import { LabelPicker } from "@/components/mcq/LabelPicker";
 import { OptionsSettings } from "@/components/mcq/OptionsSettings";
 import { InsertMenu } from "@/components/mcq/InsertMenu";
 import { TableDialog } from "@/components/mcq/TableDialog";
+import { EquationsPicker } from "@/components/mcq/EquationsPicker";
 import { useMcq } from "@/lib/mcq-store";
+import { installLastFocusTracker } from "@/lib/last-focus";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -20,6 +22,10 @@ export const Route = createFileRoute("/")({
 function Editor() {
   const { questions, currentId, setCurrent } = useMcq();
   const start = useRef<{ x: number; y: number; t: number; blocked: boolean } | null>(null);
+
+  useEffect(() => {
+    installLastFocusTracker();
+  }, []);
 
   const isBlocked = (target: EventTarget | null) => {
     const el = target as HTMLElement | null;
@@ -88,6 +94,7 @@ function Editor() {
       <OptionsSettings />
       <InsertMenu />
       <TableDialog />
+      <EquationsPicker />
     </div>
   );
 }
