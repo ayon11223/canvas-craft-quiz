@@ -2,13 +2,13 @@ import { FolderOpen, ScanLine, Plus, FunctionSquare, Type, Sparkles } from "luci
 import { useMcq } from "@/lib/mcq-store";
 
 export function BottomToolbar() {
-  const { setInsertMenuOpen, setSolutionOpen, solutionOpen, addItem } = useMcq();
+  const { setInsertMenuOpen, setSolutionOpen, solutionOpen, setEquationsPickerOpen, addItem } = useMcq();
 
   const items = [
     { icon: FolderOpen, label: "Library", onClick: () => {} },
     { icon: ScanLine, label: "Scanner", onClick: () => {} },
     { icon: Plus, label: "Insert", onClick: () => setInsertMenuOpen(true) },
-    { icon: FunctionSquare, label: "Equations", onClick: () => addItem("equation", "∫f(x)dx") },
+    { icon: FunctionSquare, label: "Equations", onClick: () => setEquationsPickerOpen(true) },
     { icon: Type, label: "Text Box", onClick: () => addItem("text", "") },
     { icon: Sparkles, label: "AI", onClick: () => setSolutionOpen(!solutionOpen) },
   ];
