@@ -78,6 +78,7 @@ interface State {
   labelPickerOpen: boolean;
   optionsSettingsOpen: boolean;
   insertMenuOpen: boolean;
+  equationsPickerOpen: boolean;
   tableDialog: { mode: TableMode } | null;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
@@ -104,6 +105,7 @@ interface State {
   setLabelPickerOpen: (v: boolean) => void;
   setOptionsSettingsOpen: (v: boolean) => void;
   setInsertMenuOpen: (v: boolean) => void;
+  setEquationsPickerOpen: (v: boolean) => void;
   setTableDialog: (v: { mode: TableMode } | null) => void;
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
@@ -141,6 +143,7 @@ export const useMcq = create<State>((set, get) => ({
   labelPickerOpen: false,
   optionsSettingsOpen: false,
   insertMenuOpen: false,
+  equationsPickerOpen: false,
   tableDialog: null,
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
@@ -317,6 +320,7 @@ export const useMcq = create<State>((set, get) => ({
   setLabelPickerOpen: (v) => set({ labelPickerOpen: v }),
   setOptionsSettingsOpen: (v) => set({ optionsSettingsOpen: v }),
   setInsertMenuOpen: (v) => set({ insertMenuOpen: v }),
+  setEquationsPickerOpen: (v) => set({ equationsPickerOpen: v }),
   setTableDialog: (v) => set({ tableDialog: v }),
   setLabelStyle: (s) => get().updateCurrent({ labelStyle: s }),
   setTickStyle: (s) => get().updateCurrent({ tickStyle: s }),
