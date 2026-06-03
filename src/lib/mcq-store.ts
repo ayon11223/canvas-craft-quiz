@@ -151,6 +151,8 @@ export const useMcq = create<State>((set, get) => ({
   insertMenuOpen: false,
   equationsPickerOpen: false,
   tableDialog: null,
+  gridViewOpen: false,
+  setGridViewOpen: (v) => set({ gridViewOpen: v }),
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     const q = blankQuestion();
