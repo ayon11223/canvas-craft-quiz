@@ -83,6 +83,10 @@ interface State {
   setCurrent: (id: string) => void;
   addQuestion: () => void;
   reorderQuestions: (ids: string[]) => void;
+  duplicateQuestion: (id: string) => void;
+  removeQuestion: (id: string) => void;
+  removeQuestions: (ids: string[]) => void;
+  duplicateQuestions: (ids: string[]) => void;
   updateCurrent: (patch: Partial<Question>) => void;
   setOption: (id: string, patch: Partial<Option>) => void;
   reorderOptions: (ids: string[]) => void;
