@@ -44,7 +44,7 @@ export function OptionsList() {
         </div>
       </div>
       <div className="rounded-2xl bg-card p-3 shadow-soft border border-border">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToVerticalAxis, restrictToParentElement]}>
           <SortableContext items={q.options.map((o) => o.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2">
               {q.options.map((o, i) => (
