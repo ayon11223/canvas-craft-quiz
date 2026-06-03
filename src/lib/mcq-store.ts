@@ -112,6 +112,7 @@ interface State {
   setInsertMenuOpen: (v: boolean) => void;
   setEquationsPickerOpen: (v: boolean) => void;
   setTableDialog: (v: { mode: TableMode } | null) => void;
+  setGridViewOpen: (v: boolean) => void;
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
