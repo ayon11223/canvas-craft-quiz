@@ -79,10 +79,15 @@ interface State {
   optionsSettingsOpen: boolean;
   insertMenuOpen: boolean;
   equationsPickerOpen: boolean;
+  gridViewOpen: boolean;
   tableDialog: { mode: TableMode } | null;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
   reorderQuestions: (ids: string[]) => void;
+  duplicateQuestion: (id: string) => void;
+  removeQuestion: (id: string) => void;
+  removeQuestions: (ids: string[]) => void;
+  duplicateQuestions: (ids: string[]) => void;
   updateCurrent: (patch: Partial<Question>) => void;
   setOption: (id: string, patch: Partial<Option>) => void;
   reorderOptions: (ids: string[]) => void;
@@ -107,6 +112,7 @@ interface State {
   setInsertMenuOpen: (v: boolean) => void;
   setEquationsPickerOpen: (v: boolean) => void;
   setTableDialog: (v: { mode: TableMode } | null) => void;
+  setGridViewOpen: (v: boolean) => void;
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
@@ -145,6 +151,8 @@ export const useMcq = create<State>((set, get) => ({
   insertMenuOpen: false,
   equationsPickerOpen: false,
   tableDialog: null,
+  gridViewOpen: false,
+  setGridViewOpen: (v) => set({ gridViewOpen: v }),
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     const q = blankQuestion();
@@ -154,6 +162,58 @@ export const useMcq = create<State>((set, get) => ({
     set((s) => ({
       questions: ids.map((id) => s.questions.find((q) => q.id === id)!).filter(Boolean),
     })),
+  duplicateQuestion: (id) =>
+    set((s) => {
+      const src = s.questions.find((q) => q.id === id);
+      if (!src) return s;
+      const copy: Question = {
+        ...src,
+        id: uid(),
+        items: src.items.map((it) => ({ ...it, id: uid(), data: it.data?.map((r) => r.slice()) })),
+        options: src.options.map((o) => ({ ...o, id: uid() })),
+      };
+      const idx = s.questions.findIndex((q) => q.id === id);
+      const next = [...s.questions];
+      next.splice(idx + 1, 0, copy);
+      return { questions: next };
+    }),
+  removeQuestion: (id) =>
+    set((s) => {
+      const next = s.questions.filter((q) => q.id !== id);
+      if (next.length === 0) {
+        const q = blankQuestion();
+        return { questions: [q], currentId: q.id };
+      }
+      const currentId = s.currentId === id ? next[0].id : s.currentId;
+      return { questions: next, currentId };
+    }),
+  removeQuestions: (ids) =>
+    set((s) => {
+      const remove = new Set(ids);
+      const next = s.questions.filter((q) => !remove.has(q.id));
+      if (next.length === 0) {
+        const q = blankQuestion();
+        return { questions: [q], currentId: q.id };
+      }
+      const currentId = remove.has(s.currentId) ? next[0].id : s.currentId;
+      return { questions: next, currentId };
+    }),
+  duplicateQuestions: (ids) =>
+    set((s) => {
+      const next: Question[] = [];
+      for (const q of s.questions) {
+        next.push(q);
+        if (ids.includes(q.id)) {
+          next.push({
+            ...q,
+            id: uid(),
+            items: q.items.map((it) => ({ ...it, id: uid(), data: it.data?.map((r) => r.slice()) })),
+            options: q.options.map((o) => ({ ...o, id: uid() })),
+          });
+        }
+      }
+      return { questions: next };
+    }),
   updateCurrent: (patch) =>
     set((s) => ({
       questions: s.questions.map((q) => (q.id === s.currentId ? { ...q, ...patch } : q)),
