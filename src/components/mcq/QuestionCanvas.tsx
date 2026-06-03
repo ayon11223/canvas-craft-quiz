@@ -117,11 +117,7 @@ function FigureArea() {
           />
         ))}
       </AnimatePresence>
-      {q.items.length === 0 && (
-        <div className="absolute inset-0 grid place-items-center text-canvas-foreground/40 text-xs text-center px-6 pointer-events-none">
-          Tap + to add shapes, equations or import figures
-        </div>
-      )}
+      {/* empty state intentionally blank */}
     </div>
   );
 }
