@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { TopBar } from "@/components/mcq/TopBar";
 import { QuestionCanvas } from "@/components/mcq/QuestionCanvas";
 import { OptionsList } from "@/components/mcq/OptionsList";
@@ -21,18 +22,28 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   const { questions, currentId, setCurrent } = useMcq();
-  const start = useRef<{ x: number; y: number; t: number; blocked: boolean } | null>(null);
+  const [direction, setDirection] = useState(0);
+  const prevId = useRef(currentId);
+  const start = useRef<{ x: number; y: number; t: number; blocked: boolean; locked: "h" | "v" | null } | null>(null);
 
   useEffect(() => {
     installLastFocusTracker();
   }, []);
 
+  // Detect direction changes (used by SlideStrip too).
+  useEffect(() => {
+    if (prevId.current === currentId) return;
+    const prevIdx = questions.findIndex((q) => q.id === prevId.current);
+    const nextIdx = questions.findIndex((q) => q.id === currentId);
+    setDirection(nextIdx > prevIdx ? 1 : -1);
+    prevId.current = currentId;
+  }, [currentId, questions]);
+
   const isBlocked = (target: EventTarget | null) => {
     const el = target as HTMLElement | null;
     if (!el) return false;
-    // Block when starting inside actual text input, canvas-item drag, or explicit no-swipe regions.
     return !!el.closest(
-      "input, textarea, select, [contenteditable='true'], [data-canvas-item], [data-no-swipe]",
+      "input, textarea, select, button, [contenteditable='true'], [data-canvas-item], [data-no-swipe]",
     );
   };
 
@@ -43,17 +54,22 @@ function Editor() {
       y: t.clientY,
       t: Date.now(),
       blocked: isBlocked(e.target),
+      locked: null,
     };
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
     const s = start.current;
     if (!s || s.blocked) return;
-    // Cancel if becomes clearly vertical (let scroll happen).
     const t = e.touches[0];
     const dx = t.clientX - s.x;
     const dy = t.clientY - s.y;
-    if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx) * 1.4) {
+    // Lock axis after meaningful movement.
+    if (!s.locked && Math.abs(dx) + Math.abs(dy) > 12) {
+      s.locked = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    }
+    // If user scrolls vertically, abort swipe.
+    if (s.locked === "v") {
       start.current = null;
     }
   };
@@ -61,31 +77,43 @@ function Editor() {
   const onTouchEnd = (e: React.TouchEvent) => {
     const s = start.current;
     start.current = null;
-    if (!s || s.blocked) return;
+    if (!s || s.blocked || s.locked !== "h") return;
     const t = e.changedTouches[0];
     const dx = t.clientX - s.x;
-    const dy = t.clientY - s.y;
     const dt = Date.now() - s.t;
-    if (Math.abs(dx) < 50) return;
-    if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
-    if (dt > 700) return;
+    if (Math.abs(dx) < 60) return;
+    if (dt > 800) return;
     const idx = questions.findIndex((q) => q.id === currentId);
     const next = dx < 0 ? idx + 1 : idx - 1;
-    if (next >= 0 && next < questions.length) setCurrent(questions[next].id);
+    if (next >= 0 && next < questions.length) {
+      setDirection(dx < 0 ? 1 : -1);
+      setCurrent(questions[next].id);
+    }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-screen bg-background overflow-hidden">
       <TopBar />
       <main
-        className="flex-1 overflow-y-auto pb-2"
+        className="flex-1 overflow-y-auto overflow-x-hidden pb-2 relative"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <QuestionCanvas />
-        <OptionsList />
-        <SolutionPanel />
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
+          <motion.div
+            key={currentId}
+            custom={direction}
+            initial={{ x: direction === 0 ? 0 : direction * 60, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: direction * -60, opacity: 0 }}
+            transition={{ type: "tween", duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          >
+            <QuestionCanvas />
+            <OptionsList />
+            <SolutionPanel />
+          </motion.div>
+        </AnimatePresence>
       </main>
       <SlideStrip />
       <BottomToolbar />

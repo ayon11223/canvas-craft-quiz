@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, type DragEndEvent } from "@dnd-kit/core";
+import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifiers";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock, Eraser } from "lucide-react";
@@ -43,7 +44,7 @@ export function OptionsList() {
         </div>
       </div>
       <div className="rounded-2xl bg-card p-3 shadow-soft border border-border">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToVerticalAxis, restrictToParentElement]}>
           <SortableContext items={q.options.map((o) => o.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2">
               {q.options.map((o, i) => (
