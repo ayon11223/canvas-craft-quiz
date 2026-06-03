@@ -124,6 +124,7 @@ function Editor() {
       <InsertMenu />
       <TableDialog />
       <EquationsPicker />
+      <SlideGrid />
     </div>
   );
 }
