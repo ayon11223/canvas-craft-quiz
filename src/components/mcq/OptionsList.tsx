@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, type DragEndEvent } from "@dnd-kit/core";
+import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifiers";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock, Eraser } from "lucide-react";
