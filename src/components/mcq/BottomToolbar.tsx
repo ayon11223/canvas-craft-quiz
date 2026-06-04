@@ -10,7 +10,6 @@ import {
   Eye,
   Layers,
   Settings2,
-  Palette,
   SlidersHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
