@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { Search, X, LayoutGrid, List } from "lucide-react";
 import { useMcq } from "@/lib/mcq-store";
 import { insertAtLastFocus } from "@/lib/last-focus";
