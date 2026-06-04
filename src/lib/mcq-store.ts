@@ -127,7 +127,7 @@ const blankQuestion = (): Question => ({
   figureOpen: false,
   canvasSize: "closed",
   labelStyle: "A",
-  tickStyle: "label",
+  tickStyle: "none",
   solution: "",
   footer: "",
   options: [
