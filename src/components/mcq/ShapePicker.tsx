@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { Search, Mic, X } from "lucide-react";
 import { useMcq, type ShapeKind } from "@/lib/mcq-store";
 import { Shape } from "./Shape";
