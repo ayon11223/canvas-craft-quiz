@@ -18,6 +18,7 @@ import {
   arrayMove,
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
+import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 
 export function SlideGrid() {
@@ -120,7 +121,7 @@ export function SlideGrid() {
 
           {/* Grid */}
           <div className="flex-1 overflow-y-auto px-3 py-4 pb-28">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToParentElement]}>
               <SortableContext items={questions.map((q) => q.id)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-2 gap-3">
                   {questions.map((q, i) => (
@@ -362,15 +363,15 @@ function GridThumb({
         )}
       </button>
 
-      {/* Per-card quick actions */}
+      {/* Per-card quick actions — stacked vertically below the page number */}
       {!selectMode && (
-        <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1">
+        <div className="absolute top-8 right-1.5 flex flex-col items-center gap-1">
           <button
             onClick={(e) => {
               e.stopPropagation();
               duplicateQuestion(q.id);
             }}
-            className="size-6 rounded-full bg-background/80 backdrop-blur text-foreground/80 hover:text-foreground grid place-items-center shadow-pop"
+            className="size-5 rounded-full bg-background/80 backdrop-blur text-foreground/80 hover:text-foreground grid place-items-center shadow-pop"
             aria-label="Duplicate"
           >
             <Copy className="size-3" />
@@ -380,7 +381,7 @@ function GridThumb({
               e.stopPropagation();
               removeQuestion(q.id);
             }}
-            className="size-6 rounded-full bg-background/80 backdrop-blur text-destructive hover:bg-destructive/10 grid place-items-center shadow-pop"
+            className="size-5 rounded-full bg-background/80 backdrop-blur text-destructive hover:bg-destructive/10 grid place-items-center shadow-pop"
             aria-label="Delete"
           >
             <Trash2 className="size-3" />

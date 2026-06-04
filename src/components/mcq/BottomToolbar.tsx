@@ -10,7 +10,6 @@ import {
   Eye,
   Layers,
   Settings2,
-  Palette,
   SlidersHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -54,7 +53,6 @@ export function BottomToolbar() {
 
   const pageOne: Item[] = [
     { icon: FolderOpen, label: "Library", onClick: stub("Library") },
-    { icon: ScanLine, label: "Scanner", onClick: stub("Scanner") },
     { icon: Plus, label: "Insert", onClick: () => setInsertMenuOpen(true) },
     { icon: FunctionSquare, label: "Equations", onClick: () => setEquationsPickerOpen(true) },
     { icon: Type, label: "Text Box", onClick: () => addItem("text", "") },
@@ -62,10 +60,10 @@ export function BottomToolbar() {
   ];
 
   const pageTwo: Item[] = [
+    { icon: ScanLine, label: "Scanner", onClick: stub("Scanner") },
     { icon: Eye, label: "Preview", onClick: stub("Preview") },
     { icon: Layers, label: "Layers", onClick: stub("Layers") },
     { icon: Settings2, label: "Choices", onClick: () => setOptionsSettingsOpen(true) },
-    { icon: Palette, label: "Design", onClick: stub("Question Design") },
     { icon: SlidersHorizontal, label: "Project", onClick: stub("Project Settings") },
   ];
 

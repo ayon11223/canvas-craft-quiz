@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { useState } from "react";
 import {
   ListChecks,
@@ -22,13 +22,25 @@ const TICK_OPTIONS: { id: TickStyle; name: string; desc: string }[] = [
 ];
 
 export function OptionsSettings() {
-  const { optionsSettingsOpen, setOptionsSettingsOpen, setLabelPickerOpen, clearOptions, setTickStyle, cycleCanvasSize, addItem } = useMcq();
+  const {
+    optionsSettingsOpen,
+    setOptionsSettingsOpen,
+    setLabelPickerOpen,
+    clearOptions,
+    setTickStyle,
+    cycleCanvasSize,
+    addItem,
+  } = useMcq();
   const q = useCurrentQuestion();
   const [tickOpen, setTickOpen] = useState(false);
 
   const close = () => {
     setOptionsSettingsOpen(false);
     setTickOpen(false);
+  };
+
+  const onDragEnd = (_: unknown, info: PanInfo) => {
+    if (info.offset.y > 100 || info.velocity.y > 500) close();
   };
 
   const items = [
@@ -41,12 +53,7 @@ export function OptionsSettings() {
         setLabelPickerOpen(true);
       },
     },
-    {
-      icon: Sigma,
-      label: "Equations",
-      hint: "Coming soon",
-      onClick: () => {},
-    },
+    { icon: Sigma, label: "Equations", hint: "Coming soon", onClick: () => {} },
     {
       icon: CheckCircle2,
       label: "Tick mark",
@@ -74,18 +81,8 @@ export function OptionsSettings() {
         close();
       },
     },
-    {
-      icon: ClipboardPaste,
-      label: "Paste",
-      hint: "Coming soon",
-      onClick: () => {},
-    },
-    {
-      icon: FileText,
-      label: "Question format",
-      hint: "Coming soon",
-      onClick: () => {},
-    },
+    { icon: ClipboardPaste, label: "Paste", hint: "Coming soon", onClick: () => {} },
+    { icon: FileText, label: "Question format", hint: "Coming soon", onClick: () => {} },
   ];
 
   return (
@@ -93,32 +90,38 @@ export function OptionsSettings() {
       {optionsSettingsOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/40 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={close}
           />
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl shadow-pop pb-[env(safe-area-inset-bottom)] max-h-[85vh] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 z-50 canvas-paper rounded-t-3xl shadow-pop pb-[env(safe-area-inset-bottom)] max-h-[85vh] flex flex-col"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 32 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={onDragEnd}
           >
-            <div className="mx-auto mt-2 mb-1 h-1.5 w-12 rounded-full bg-muted-foreground/30 shrink-0" />
-            <div className="px-5 pt-2 pb-5 overflow-y-auto">
+            <div className="mx-auto mt-2 mb-2 h-1.5 w-12 rounded-full bg-canvas-foreground/20 shrink-0" />
+            <div className="px-5 pt-1 pb-5 overflow-y-auto">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="font-display font-semibold text-base">Choice settings</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <h3 className="font-display font-semibold text-base text-canvas-foreground">
+                    Choice settings
+                  </h3>
+                  <p className="text-xs text-canvas-foreground/60 mt-0.5">
                     Configure how this question's answers look and behave.
                   </p>
                 </div>
                 <button
                   onClick={close}
                   aria-label="Close"
-                  className="size-9 -mt-1 -mr-1 rounded-full grid place-items-center text-muted-foreground hover:text-foreground hover:bg-secondary shrink-0"
+                  className="size-9 rounded-full border border-canvas-foreground/15 grid place-items-center text-canvas-foreground/70 shrink-0"
                 >
                   <X className="size-4" />
                 </button>
@@ -131,12 +134,12 @@ export function OptionsSettings() {
                       className={`w-full flex items-center gap-3 rounded-xl px-3 py-3 transition ${
                         it.destructive
                           ? "bg-destructive/10 hover:bg-destructive/20 text-destructive"
-                          : "bg-secondary/50 hover:bg-secondary"
+                          : "bg-canvas-foreground/5 hover:bg-canvas-foreground/10 text-canvas-foreground"
                       }`}
                     >
                       <span
                         className={`size-9 rounded-lg grid place-items-center shrink-0 ${
-                          it.destructive ? "bg-destructive/20" : "bg-background"
+                          it.destructive ? "bg-destructive/20" : "bg-canvas-foreground/10"
                         }`}
                       >
                         <it.icon className="size-4" />
@@ -144,13 +147,11 @@ export function OptionsSettings() {
                       <div className="flex-1 text-left">
                         <div className="text-sm font-medium">{it.label}</div>
                         {it.hint && (
-                          <div className="text-[11px] text-muted-foreground">{it.hint}</div>
+                          <div className="text-[11px] opacity-70">{it.hint}</div>
                         )}
                       </div>
                       <ChevronRight
-                        className={`size-4 text-muted-foreground transition ${
-                          it.expanded ? "rotate-90" : ""
-                        }`}
+                        className={`size-4 opacity-60 transition ${it.expanded ? "rotate-90" : ""}`}
                       />
                     </button>
                     {it.label === "Tick mark" && (
@@ -174,17 +175,17 @@ export function OptionsSettings() {
                                     }}
                                     className={`w-full flex items-center justify-between rounded-lg px-3 py-2 transition ${
                                       active
-                                        ? "bg-primary/15 ring-1 ring-primary/40"
-                                        : "hover:bg-secondary/60"
+                                        ? "bg-canvas-foreground/15 ring-1 ring-canvas-foreground/40"
+                                        : "hover:bg-canvas-foreground/5"
                                     }`}
                                   >
                                     <div className="text-left">
-                                      <div className="text-sm">{t.name}</div>
-                                      <div className="text-[11px] text-muted-foreground">
+                                      <div className="text-sm text-canvas-foreground">{t.name}</div>
+                                      <div className="text-[11px] text-canvas-foreground/60">
                                         {t.desc}
                                       </div>
                                     </div>
-                                    {active && <Check className="size-4 text-primary" />}
+                                    {active && <Check className="size-4 text-canvas-foreground" />}
                                   </button>
                                 );
                               })}
