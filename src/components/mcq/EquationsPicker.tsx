@@ -155,6 +155,10 @@ export function EquationsPicker() {
   // Prevent the panel from stealing focus from the active text field.
   const keepFocus = (e: React.MouseEvent) => e.preventDefault();
 
+  const onDragEnd = (_: unknown, info: PanInfo) => {
+    if (info.offset.y > 100 || info.velocity.y > 500) setEquationsPickerOpen(false);
+  };
+
   return (
     <AnimatePresence>
       {equationsPickerOpen && (
@@ -174,6 +178,10 @@ export function EquationsPicker() {
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 32 }}
             onMouseDown={keepFocus}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={onDragEnd}
           >
             <div className="mx-auto mt-2 mb-2 h-1.5 w-12 rounded-full bg-canvas-foreground/20" />
 
