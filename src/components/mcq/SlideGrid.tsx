@@ -121,7 +121,7 @@ export function SlideGrid() {
 
           {/* Grid */}
           <div className="flex-1 overflow-y-auto px-3 py-4 pb-28">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} modifiers={[restrictToParentElement]}>
               <SortableContext items={questions.map((q) => q.id)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-2 gap-3">
                   {questions.map((q, i) => (
