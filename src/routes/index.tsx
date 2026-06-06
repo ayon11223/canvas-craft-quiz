@@ -15,6 +15,7 @@ import { TableDialog } from "@/components/mcq/TableDialog";
 import { EquationsPicker } from "@/components/mcq/EquationsPicker";
 import { SlideGrid } from "@/components/mcq/SlideGrid";
 import { useMcq } from "@/lib/mcq-store";
+import { undo, redo } from "@/lib/history";
 import { installLastFocusTracker } from "@/lib/last-focus";
 
 export const Route = createFileRoute("/")({
