@@ -237,43 +237,55 @@ export const useMcq = create<State>((set, get) => ({
       questions: s.questions.map((q) => (q.id === s.currentId ? { ...q, ...patch } : q)),
     }));
   },
-  setOption: (id, patch) =>
+  setOption: (id, patch) => {
+    const keys = Object.keys(patch).sort().join(",");
+    h(`setOption:${id}:${keys}`);
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, options: q.options.map((o) => (o.id === id ? { ...o, ...patch } : o)) }
           : q,
       ),
-    })),
-  reorderOptions: (ids) =>
+    }));
+  },
+  reorderOptions: (ids) => {
+    h("reorderOptions");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, options: ids.map((id) => q.options.find((o) => o.id === id)!).filter(Boolean) }
           : q,
       ),
-    })),
-  addOption: () =>
+    }));
+  },
+  addOption: () => {
+    h("addOption");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId ? { ...q, options: [...q.options, { id: uid(), text: "" }] } : q,
       ),
-    })),
-  removeOption: (id) =>
+    }));
+  },
+  removeOption: (id) => {
+    h("removeOption");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId ? { ...q, options: q.options.filter((o) => o.id !== id) } : q,
       ),
-    })),
-  clearOptions: () =>
+    }));
+  },
+  clearOptions: () => {
+    h("clearOptions");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, options: q.options.map((o) => ({ ...o, text: "", correct: false })) }
           : q,
       ),
-    })),
-  shuffleOptions: () =>
+    }));
+  },
+  shuffleOptions: () => {
+    h("shuffleOptions");
     set((s) => ({
       questions: s.questions.map((q) => {
         if (q.id !== s.currentId) return q;
@@ -284,8 +296,10 @@ export const useMcq = create<State>((set, get) => ({
         }
         return { ...q, options: arr };
       }),
-    })),
+    }));
+  },
   autoFillOptions: () => {
+    h("autoFillOptions");
     const samples = ["Lorem ipsum", "Dolor sit amet", "Consectetur", "Adipiscing elit", "Sed do eiusmod", "Tempor incididunt"];
     set((s) => ({
       questions: s.questions.map((q) =>
@@ -316,6 +330,7 @@ export const useMcq = create<State>((set, get) => ({
     get().updateCurrent({ canvasSize: "closed", figureOpen: false });
   },
   addItem: (kind, label) => {
+    h("addItem");
     const isText = kind === "text";
     const isImage = kind === "image";
     const item: CanvasItem = {
@@ -339,6 +354,7 @@ export const useMcq = create<State>((set, get) => ({
     }));
   },
   addTable: (rows, cols, mode) => {
+    h("addTable");
     const data = Array.from({ length: rows }, () => Array.from({ length: cols }, () => ""));
     const item: CanvasItem = {
       id: uid(),
@@ -362,15 +378,22 @@ export const useMcq = create<State>((set, get) => ({
       tableDialog: null,
     }));
   },
-  updateItem: (id, patch) =>
+  updateItem: (id, patch) => {
+    // Skip pos/size patches — drag start pushes history once; this keeps
+    // per-frame drag updates out of the history stack.
+    const keys = Object.keys(patch);
+    const isDragOnly = keys.length > 0 && keys.every((k) => k === "x" || k === "y" || k === "w" || k === "h");
+    if (!isDragOnly) h(`updateItem:${id}:${keys.sort().join(",")}`);
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, items: q.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) }
           : q,
       ),
-    })),
-  updateItemCell: (id, r, c, value) =>
+    }));
+  },
+  updateItemCell: (id, r, c, value) => {
+    h(`cell:${id}:${r}:${c}`);
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
@@ -385,14 +408,17 @@ export const useMcq = create<State>((set, get) => ({
             }
           : q,
       ),
-    })),
-  removeItem: (id) =>
+    }));
+  },
+  removeItem: (id) => {
+    h("removeItem");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId ? { ...q, items: q.items.filter((it) => it.id !== id) } : q,
       ),
       selectedItemId: null,
-    })),
+    }));
+  },
   selectItem: (id) => set({ selectedItemId: id }),
   setShapePicker: (v) => set({ shapePickerOpen: v }),
   setSolutionOpen: (v) => set({ solutionOpen: v }),
