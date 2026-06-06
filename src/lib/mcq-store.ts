@@ -116,6 +116,7 @@ interface State {
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
+  _applySnapshot: (snap: { questions: Question[]; currentId: string }) => void;
 }
 
 const uid = () => Math.random().toString(36).slice(2, 9);
