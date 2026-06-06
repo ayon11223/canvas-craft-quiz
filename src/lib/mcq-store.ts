@@ -387,9 +387,10 @@ export const useMcq = create<State>((set, get) => ({
   setInsertMenuOpen: (v) => set({ insertMenuOpen: v }),
   setEquationsPickerOpen: (v) => set({ equationsPickerOpen: v }),
   setTableDialog: (v) => set({ tableDialog: v }),
-  setLabelStyle: (s) => get().updateCurrent({ labelStyle: s }),
-  setTickStyle: (s) => get().updateCurrent({ tickStyle: s }),
+  setLabelStyle: (s) => { h("labelStyle"); get().updateCurrent({ labelStyle: s }); },
+  setTickStyle: (s) => { h("tickStyle"); get().updateCurrent({ tickStyle: s }); },
   setSolution: (s) => get().updateCurrent({ solution: s }),
+  _applySnapshot: (snap) => set({ questions: snap.questions, currentId: snap.currentId, selectedItemId: null }),
 }));
 
 export const useCurrentQuestion = () => {
