@@ -160,14 +160,18 @@ export const useMcq = create<State>((set, get) => ({
   setGridViewOpen: (v) => set({ gridViewOpen: v }),
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
+    h("addQuestion");
     const q = blankQuestion();
     set((s) => ({ questions: [...s.questions, q], currentId: q.id }));
   },
-  reorderQuestions: (ids) =>
+  reorderQuestions: (ids) => {
+    h("reorderQuestions");
     set((s) => ({
       questions: ids.map((id) => s.questions.find((q) => q.id === id)!).filter(Boolean),
-    })),
-  duplicateQuestion: (id) =>
+    }));
+  },
+  duplicateQuestion: (id) => {
+    h("duplicateQuestion");
     set((s) => {
       const src = s.questions.find((q) => q.id === id);
       if (!src) return s;
@@ -181,8 +185,10 @@ export const useMcq = create<State>((set, get) => ({
       const next = [...s.questions];
       next.splice(idx + 1, 0, copy);
       return { questions: next };
-    }),
-  removeQuestion: (id) =>
+    });
+  },
+  removeQuestion: (id) => {
+    h("removeQuestion");
     set((s) => {
       const next = s.questions.filter((q) => q.id !== id);
       if (next.length === 0) {
@@ -191,8 +197,10 @@ export const useMcq = create<State>((set, get) => ({
       }
       const currentId = s.currentId === id ? next[0].id : s.currentId;
       return { questions: next, currentId };
-    }),
-  removeQuestions: (ids) =>
+    });
+  },
+  removeQuestions: (ids) => {
+    h("removeQuestions");
     set((s) => {
       const remove = new Set(ids);
       const next = s.questions.filter((q) => !remove.has(q.id));
@@ -202,8 +210,10 @@ export const useMcq = create<State>((set, get) => ({
       }
       const currentId = remove.has(s.currentId) ? next[0].id : s.currentId;
       return { questions: next, currentId };
-    }),
-  duplicateQuestions: (ids) =>
+    });
+  },
+  duplicateQuestions: (ids) => {
+    h("duplicateQuestions");
     set((s) => {
       const next: Question[] = [];
       for (const q of s.questions) {
@@ -218,11 +228,15 @@ export const useMcq = create<State>((set, get) => ({
         }
       }
       return { questions: next };
-    }),
-  updateCurrent: (patch) =>
+    });
+  },
+  updateCurrent: (patch) => {
+    const keys = Object.keys(patch).sort().join(",");
+    h(`updateCurrent:${useMcq.getState().currentId}:${keys}`);
     set((s) => ({
       questions: s.questions.map((q) => (q.id === s.currentId ? { ...q, ...patch } : q)),
-    })),
+    }));
+  },
   setOption: (id, patch) =>
     set((s) => ({
       questions: s.questions.map((q) =>
