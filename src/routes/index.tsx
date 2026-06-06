@@ -15,6 +15,7 @@ import { TableDialog } from "@/components/mcq/TableDialog";
 import { EquationsPicker } from "@/components/mcq/EquationsPicker";
 import { SlideGrid } from "@/components/mcq/SlideGrid";
 import { useMcq } from "@/lib/mcq-store";
+import { undo, redo } from "@/lib/history";
 import { installLastFocusTracker } from "@/lib/last-focus";
 
 export const Route = createFileRoute("/")({
@@ -29,6 +30,20 @@ function Editor() {
 
   useEffect(() => {
     installLastFocusTracker();
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.ctrlKey || e.metaKey;
+      if (!mod) return;
+      const key = e.key.toLowerCase();
+      if (key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if ((key === "z" && e.shiftKey) || key === "y") {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   // Detect direction changes (used by SlideStrip too).

@@ -1,4 +1,8 @@
 import { create } from "zustand";
+import { pushHistory } from "./history";
+
+const h = (label: string) => pushHistory(label);
+
 
 export type LabelStyle = "A" | "1" | "i" | "ka" | "I" | "a";
 
@@ -116,6 +120,7 @@ interface State {
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
+  _applySnapshot: (snap: { questions: Question[]; currentId: string }) => void;
 }
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -155,14 +160,18 @@ export const useMcq = create<State>((set, get) => ({
   setGridViewOpen: (v) => set({ gridViewOpen: v }),
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
+    h("addQuestion");
     const q = blankQuestion();
     set((s) => ({ questions: [...s.questions, q], currentId: q.id }));
   },
-  reorderQuestions: (ids) =>
+  reorderQuestions: (ids) => {
+    h("reorderQuestions");
     set((s) => ({
       questions: ids.map((id) => s.questions.find((q) => q.id === id)!).filter(Boolean),
-    })),
-  duplicateQuestion: (id) =>
+    }));
+  },
+  duplicateQuestion: (id) => {
+    h("duplicateQuestion");
     set((s) => {
       const src = s.questions.find((q) => q.id === id);
       if (!src) return s;
@@ -176,8 +185,10 @@ export const useMcq = create<State>((set, get) => ({
       const next = [...s.questions];
       next.splice(idx + 1, 0, copy);
       return { questions: next };
-    }),
-  removeQuestion: (id) =>
+    });
+  },
+  removeQuestion: (id) => {
+    h("removeQuestion");
     set((s) => {
       const next = s.questions.filter((q) => q.id !== id);
       if (next.length === 0) {
@@ -186,8 +197,10 @@ export const useMcq = create<State>((set, get) => ({
       }
       const currentId = s.currentId === id ? next[0].id : s.currentId;
       return { questions: next, currentId };
-    }),
-  removeQuestions: (ids) =>
+    });
+  },
+  removeQuestions: (ids) => {
+    h("removeQuestions");
     set((s) => {
       const remove = new Set(ids);
       const next = s.questions.filter((q) => !remove.has(q.id));
@@ -197,8 +210,10 @@ export const useMcq = create<State>((set, get) => ({
       }
       const currentId = remove.has(s.currentId) ? next[0].id : s.currentId;
       return { questions: next, currentId };
-    }),
-  duplicateQuestions: (ids) =>
+    });
+  },
+  duplicateQuestions: (ids) => {
+    h("duplicateQuestions");
     set((s) => {
       const next: Question[] = [];
       for (const q of s.questions) {
@@ -213,48 +228,64 @@ export const useMcq = create<State>((set, get) => ({
         }
       }
       return { questions: next };
-    }),
-  updateCurrent: (patch) =>
+    });
+  },
+  updateCurrent: (patch) => {
+    const keys = Object.keys(patch).sort().join(",");
+    h(`updateCurrent:${useMcq.getState().currentId}:${keys}`);
     set((s) => ({
       questions: s.questions.map((q) => (q.id === s.currentId ? { ...q, ...patch } : q)),
-    })),
-  setOption: (id, patch) =>
+    }));
+  },
+  setOption: (id, patch) => {
+    const keys = Object.keys(patch).sort().join(",");
+    h(`setOption:${id}:${keys}`);
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, options: q.options.map((o) => (o.id === id ? { ...o, ...patch } : o)) }
           : q,
       ),
-    })),
-  reorderOptions: (ids) =>
+    }));
+  },
+  reorderOptions: (ids) => {
+    h("reorderOptions");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, options: ids.map((id) => q.options.find((o) => o.id === id)!).filter(Boolean) }
           : q,
       ),
-    })),
-  addOption: () =>
+    }));
+  },
+  addOption: () => {
+    h("addOption");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId ? { ...q, options: [...q.options, { id: uid(), text: "" }] } : q,
       ),
-    })),
-  removeOption: (id) =>
+    }));
+  },
+  removeOption: (id) => {
+    h("removeOption");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId ? { ...q, options: q.options.filter((o) => o.id !== id) } : q,
       ),
-    })),
-  clearOptions: () =>
+    }));
+  },
+  clearOptions: () => {
+    h("clearOptions");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, options: q.options.map((o) => ({ ...o, text: "", correct: false })) }
           : q,
       ),
-    })),
-  shuffleOptions: () =>
+    }));
+  },
+  shuffleOptions: () => {
+    h("shuffleOptions");
     set((s) => ({
       questions: s.questions.map((q) => {
         if (q.id !== s.currentId) return q;
@@ -265,8 +296,10 @@ export const useMcq = create<State>((set, get) => ({
         }
         return { ...q, options: arr };
       }),
-    })),
+    }));
+  },
   autoFillOptions: () => {
+    h("autoFillOptions");
     const samples = ["Lorem ipsum", "Dolor sit amet", "Consectetur", "Adipiscing elit", "Sed do eiusmod", "Tempor incididunt"];
     set((s) => ({
       questions: s.questions.map((q) =>
@@ -297,6 +330,7 @@ export const useMcq = create<State>((set, get) => ({
     get().updateCurrent({ canvasSize: "closed", figureOpen: false });
   },
   addItem: (kind, label) => {
+    h("addItem");
     const isText = kind === "text";
     const isImage = kind === "image";
     const item: CanvasItem = {
@@ -320,6 +354,7 @@ export const useMcq = create<State>((set, get) => ({
     }));
   },
   addTable: (rows, cols, mode) => {
+    h("addTable");
     const data = Array.from({ length: rows }, () => Array.from({ length: cols }, () => ""));
     const item: CanvasItem = {
       id: uid(),
@@ -343,15 +378,22 @@ export const useMcq = create<State>((set, get) => ({
       tableDialog: null,
     }));
   },
-  updateItem: (id, patch) =>
+  updateItem: (id, patch) => {
+    // Skip pos/size patches — drag start pushes history once; this keeps
+    // per-frame drag updates out of the history stack.
+    const keys = Object.keys(patch);
+    const isDragOnly = keys.length > 0 && keys.every((k) => k === "x" || k === "y" || k === "w" || k === "h");
+    if (!isDragOnly) h(`updateItem:${id}:${keys.sort().join(",")}`);
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
           ? { ...q, items: q.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) }
           : q,
       ),
-    })),
-  updateItemCell: (id, r, c, value) =>
+    }));
+  },
+  updateItemCell: (id, r, c, value) => {
+    h(`cell:${id}:${r}:${c}`);
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId
@@ -366,14 +408,17 @@ export const useMcq = create<State>((set, get) => ({
             }
           : q,
       ),
-    })),
-  removeItem: (id) =>
+    }));
+  },
+  removeItem: (id) => {
+    h("removeItem");
     set((s) => ({
       questions: s.questions.map((q) =>
         q.id === s.currentId ? { ...q, items: q.items.filter((it) => it.id !== id) } : q,
       ),
       selectedItemId: null,
-    })),
+    }));
+  },
   selectItem: (id) => set({ selectedItemId: id }),
   setShapePicker: (v) => set({ shapePickerOpen: v }),
   setSolutionOpen: (v) => set({ solutionOpen: v }),
@@ -382,9 +427,10 @@ export const useMcq = create<State>((set, get) => ({
   setInsertMenuOpen: (v) => set({ insertMenuOpen: v }),
   setEquationsPickerOpen: (v) => set({ equationsPickerOpen: v }),
   setTableDialog: (v) => set({ tableDialog: v }),
-  setLabelStyle: (s) => get().updateCurrent({ labelStyle: s }),
-  setTickStyle: (s) => get().updateCurrent({ tickStyle: s }),
+  setLabelStyle: (s) => { h("labelStyle"); get().updateCurrent({ labelStyle: s }); },
+  setTickStyle: (s) => { h("tickStyle"); get().updateCurrent({ tickStyle: s }); },
   setSolution: (s) => get().updateCurrent({ solution: s }),
+  _applySnapshot: (snap) => set({ questions: snap.questions, currentId: snap.currentId, selectedItemId: null }),
 }));
 
 export const useCurrentQuestion = () => {

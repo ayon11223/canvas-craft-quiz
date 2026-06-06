@@ -2,6 +2,7 @@ import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronsUpDown, X, Plus, Trash2 } from "lucide-react";
 import { useCurrentQuestion, useMcq, type CanvasItem } from "@/lib/mcq-store";
+import { pushHistory } from "@/lib/history";
 import { Shape } from "./Shape";
 
 const HEIGHTS = { closed: 120, half: 280, full: 460 } as const;
@@ -143,6 +144,7 @@ function DraggableItem({
     e.stopPropagation();
     e.preventDefault();
     selectItem(item.id);
+    pushHistory(`drag:${item.id}:${mode}`);
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const startX = e.clientX;
