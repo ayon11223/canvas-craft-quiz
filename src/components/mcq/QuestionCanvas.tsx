@@ -144,6 +144,7 @@ function DraggableItem({
     e.stopPropagation();
     e.preventDefault();
     selectItem(item.id);
+    pushHistory(`drag:${item.id}:${mode}`);
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const startX = e.clientX;
