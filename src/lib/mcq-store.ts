@@ -1,4 +1,8 @@
 import { create } from "zustand";
+import { pushHistory } from "./history";
+
+const h = (label: string) => pushHistory(label);
+
 
 export type LabelStyle = "A" | "1" | "i" | "ka" | "I" | "a";
 
