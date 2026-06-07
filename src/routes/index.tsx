@@ -142,6 +142,8 @@ function Editor() {
       <TableDialog />
       <EquationsPicker />
       <SlideGrid />
+      <PrintPreview />
+      <ProjectSettings />
     </div>
   );
 }
