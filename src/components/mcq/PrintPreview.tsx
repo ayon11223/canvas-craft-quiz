@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Printer, SlidersHorizontal, ZoomIn, ZoomOut } from "lucide-react";
 import { useMcq, LABEL_STYLES, type Question, type TickStyle } from "@/lib/mcq-store";
