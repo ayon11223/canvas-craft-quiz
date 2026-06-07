@@ -201,6 +201,7 @@ export function PrintPreview() {
                         </div>
                       )}
                     </div>
+                    </div>
                   </div>
                 );
               })}
