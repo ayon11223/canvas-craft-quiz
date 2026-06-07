@@ -84,6 +84,8 @@ interface State {
   insertMenuOpen: boolean;
   equationsPickerOpen: boolean;
   gridViewOpen: boolean;
+  previewOpen: boolean;
+  projectSettingsOpen: boolean;
   tableDialog: { mode: TableMode } | null;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
