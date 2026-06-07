@@ -56,7 +56,7 @@ export interface Option {
 }
 
 export type CanvasSize = "closed" | "half" | "full";
-export type TickStyle = "label" | "green" | "side" | "none";
+export type TickStyle = "label" | "green" | "side" | "none" | "circle";
 
 export interface Question {
   id: string;
