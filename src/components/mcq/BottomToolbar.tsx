@@ -29,6 +29,8 @@ export function BottomToolbar() {
     setEquationsPickerOpen,
     addItem,
     setOptionsSettingsOpen,
+    setPreviewOpen,
+    setProjectSettingsOpen,
   } = useMcq();
 
   const [emblaRef, embla] = useEmblaCarousel({
@@ -61,10 +63,10 @@ export function BottomToolbar() {
 
   const pageTwo: Item[] = [
     { icon: ScanLine, label: "Scanner", onClick: stub("Scanner") },
-    { icon: Eye, label: "Preview", onClick: stub("Preview") },
+    { icon: Eye, label: "Preview", onClick: () => setPreviewOpen(true) },
     { icon: Layers, label: "Layers", onClick: stub("Layers") },
     { icon: Settings2, label: "Choices", onClick: () => setOptionsSettingsOpen(true) },
-    { icon: SlidersHorizontal, label: "Project", onClick: stub("Project Settings") },
+    { icon: SlidersHorizontal, label: "Project", onClick: () => setProjectSettingsOpen(true) },
   ];
 
   return (

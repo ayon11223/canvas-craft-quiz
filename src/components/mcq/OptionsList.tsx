@@ -99,7 +99,7 @@ function SortableOption({
   option: Option;
   label: string;
   labelHandlers: ReturnType<typeof useLongPress>;
-  tickStyle: "label" | "green" | "side" | "none";
+  tickStyle: "label" | "green" | "side" | "none" | "circle";
 }) {
   const { setOption } = useMcq();
   const [focused, setFocused] = useState(false);
@@ -110,6 +110,7 @@ function SortableOption({
   const showCheckInLabel = tickStyle === "label" && option.correct;
   const greenRow = tickStyle === "green" && option.correct;
   const sideTick = tickStyle === "side" && option.correct;
+  const circleLabel = tickStyle === "circle" && option.correct;
 
   const clearThis = () => setOption(option.id, { text: "", correct: false });
 
@@ -141,7 +142,9 @@ function SortableOption({
             ? "bg-primary text-primary-foreground"
             : greenRow
               ? "bg-emerald-500 text-white"
-              : "bg-background text-foreground"
+              : circleLabel
+                ? "bg-foreground text-background ring-2 ring-foreground"
+                : "bg-background text-foreground"
         }`}
       >
         {showCheckInLabel ? <Check className="size-4" /> : label}

@@ -104,3 +104,45 @@
 }
 /* Firefox */
 * { scrollbar-width: thin; scrollbar-color: oklch(0.5 0.01 280 / 0.25) transparent; }
+
+/* PDF preview page */
+.pdf-page {
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 4px 18px -8px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+}
+.pdf-page * { border-color: transparent; }
+.pdf-question { break-inside: avoid; page-break-inside: avoid; }
+.pdf-correct-circle {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: #111;
+  color: #fff;
+  width: 1.4em;
+  height: 1.4em;
+  line-height: 1;
+  font-weight: 600;
+  margin-right: 0.15em;
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  .pdf-export-root, .pdf-export-root * { visibility: visible !important; }
+  .pdf-export-root {
+    position: absolute !important;
+    inset: 0 !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+  .pdf-export-root .pdf-no-print { display: none !important; }
+  .pdf-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  @page { margin: 0; }
+}

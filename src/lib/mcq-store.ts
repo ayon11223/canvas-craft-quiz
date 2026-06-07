@@ -56,7 +56,7 @@ export interface Option {
 }
 
 export type CanvasSize = "closed" | "half" | "full";
-export type TickStyle = "label" | "green" | "side" | "none";
+export type TickStyle = "label" | "green" | "side" | "none" | "circle";
 
 export interface Question {
   id: string;
@@ -84,6 +84,8 @@ interface State {
   insertMenuOpen: boolean;
   equationsPickerOpen: boolean;
   gridViewOpen: boolean;
+  previewOpen: boolean;
+  projectSettingsOpen: boolean;
   tableDialog: { mode: TableMode } | null;
   setCurrent: (id: string) => void;
   addQuestion: () => void;
@@ -117,6 +119,8 @@ interface State {
   setEquationsPickerOpen: (v: boolean) => void;
   setTableDialog: (v: { mode: TableMode } | null) => void;
   setGridViewOpen: (v: boolean) => void;
+  setPreviewOpen: (v: boolean) => void;
+  setProjectSettingsOpen: (v: boolean) => void;
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
@@ -157,7 +161,11 @@ export const useMcq = create<State>((set, get) => ({
   equationsPickerOpen: false,
   tableDialog: null,
   gridViewOpen: false,
+  previewOpen: false,
+  projectSettingsOpen: false,
   setGridViewOpen: (v) => set({ gridViewOpen: v }),
+  setPreviewOpen: (v) => set({ previewOpen: v }),
+  setProjectSettingsOpen: (v) => set({ projectSettingsOpen: v }),
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     h("addQuestion");
