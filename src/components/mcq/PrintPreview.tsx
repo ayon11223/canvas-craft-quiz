@@ -141,22 +141,29 @@ export function PrintPreview() {
             <div className="flex flex-col items-center gap-6">
               {pages.map((pageQs, pageIdx) => {
                 const startIdx = pages.slice(0, pageIdx).reduce((s, p) => s + p.length, 0);
+                const pageWpx = dims.w * 3.78 * zoom;
+                const pageHpx = dims.h * 3.78 * zoom;
                 return (
                   <div
                     key={pageIdx}
-                    className="pdf-page"
-                    style={{
-                      width: `${dims.w}mm`,
-                      height: `${dims.h}mm`,
-                      padding: `${settings.margin}mm`,
-                      fontFamily: settings.fontFamily,
-                      fontSize: `${settings.fontSize}pt`,
-                      lineHeight: settings.lineHeight,
-                      transform: `scale(${zoom})`,
-                      transformOrigin: "top center",
-                      marginBottom: `${(dims.h * (zoom - 1)) * 3.78}px`,
-                    }}
+                    style={{ width: pageWpx, height: pageHpx, position: "relative" }}
                   >
+                    <div
+                      className="pdf-page"
+                      style={{
+                        width: `${dims.w}mm`,
+                        height: `${dims.h}mm`,
+                        padding: `${settings.margin}mm`,
+                        fontFamily: settings.fontFamily,
+                        fontSize: `${settings.fontSize}pt`,
+                        lineHeight: settings.lineHeight,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                      }}
+                    >
                     <div className="flex flex-col h-full">
                       {settings.showHeader && (
                         <div
