@@ -29,6 +29,8 @@ export function BottomToolbar() {
     setEquationsPickerOpen,
     addItem,
     setOptionsSettingsOpen,
+    setPreviewOpen,
+    setProjectSettingsOpen,
   } = useMcq();
 
   const [emblaRef, embla] = useEmblaCarousel({
