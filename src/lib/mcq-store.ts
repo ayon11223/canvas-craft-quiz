@@ -119,6 +119,8 @@ interface State {
   setEquationsPickerOpen: (v: boolean) => void;
   setTableDialog: (v: { mode: TableMode } | null) => void;
   setGridViewOpen: (v: boolean) => void;
+  setPreviewOpen: (v: boolean) => void;
+  setProjectSettingsOpen: (v: boolean) => void;
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
