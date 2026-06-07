@@ -161,7 +161,11 @@ export const useMcq = create<State>((set, get) => ({
   equationsPickerOpen: false,
   tableDialog: null,
   gridViewOpen: false,
+  previewOpen: false,
+  projectSettingsOpen: false,
   setGridViewOpen: (v) => set({ gridViewOpen: v }),
+  setPreviewOpen: (v) => set({ previewOpen: v }),
+  setProjectSettingsOpen: (v) => set({ projectSettingsOpen: v }),
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     h("addQuestion");
