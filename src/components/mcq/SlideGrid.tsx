@@ -63,7 +63,7 @@ export function SlideGrid() {
     if (selectMode) {
       toggleSelect(id);
     } else {
-      setCurrent(id);
+      setCurrent(id, "grid");
       close();
     }
   };
