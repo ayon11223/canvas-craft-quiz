@@ -159,6 +159,9 @@ interface State {
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
+  setStyle: (patch: Partial<TextStyle>) => void;
+  navSource: NavSource;
+  setCurrent: (id: string, source?: NavSource) => void;
   _applySnapshot: (snap: { questions: Question[]; currentId: string }) => void;
 }
 
