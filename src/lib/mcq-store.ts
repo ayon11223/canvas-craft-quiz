@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { create } from "zustand";
 import { pushHistory } from "./history";
 
@@ -58,6 +59,53 @@ export interface Option {
 export type CanvasSize = "closed" | "half" | "full";
 export type TickStyle = "label" | "green" | "side" | "none" | "circle";
 
+export type TextAlign = "left" | "center" | "right" | "justify";
+export interface TextStyle {
+  fontFamily: string;
+  fontSize: number;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  align: TextAlign;
+  color?: string;
+}
+
+export const DEFAULT_TEXT_STYLE: TextStyle = {
+  fontFamily: "Inter",
+  fontSize: 15,
+  bold: false,
+  italic: false,
+  underline: false,
+  align: "left",
+};
+
+export const FONT_FAMILIES = [
+  "Inter",
+  "Calibri",
+  "Arial",
+  "Helvetica",
+  "Georgia",
+  "Times New Roman",
+  "Courier New",
+  "Hind Siliguri",
+  "Noto Serif Bengali",
+] as const;
+
+export type NavSource = "swipe" | "grid" | "click" | null;
+
+export function textStyleToCss(s: TextStyle | undefined): CSSProperties {
+  const st = { ...DEFAULT_TEXT_STYLE, ...(s ?? {}) };
+  return {
+    fontFamily: st.fontFamily,
+    fontSize: st.fontSize,
+    fontWeight: st.bold ? 700 : undefined,
+    fontStyle: st.italic ? "italic" : undefined,
+    textDecoration: st.underline ? "underline" : undefined,
+    textAlign: st.align,
+    color: st.color,
+  };
+}
+
 export interface Question {
   id: string;
   text: string;
@@ -69,6 +117,7 @@ export interface Question {
   tickStyle: TickStyle;
   solution: string;
   footer: string;
+  style?: TextStyle;
 }
 
 export type TableMode = "table" | "matrix";
@@ -87,7 +136,8 @@ interface State {
   previewOpen: boolean;
   projectSettingsOpen: boolean;
   tableDialog: { mode: TableMode } | null;
-  setCurrent: (id: string) => void;
+  navSource: NavSource;
+  setCurrent: (id: string, source?: NavSource) => void;
   addQuestion: () => void;
   reorderQuestions: (ids: string[]) => void;
   duplicateQuestion: (id: string) => void;
@@ -124,6 +174,7 @@ interface State {
   setLabelStyle: (s: LabelStyle) => void;
   setTickStyle: (s: TickStyle) => void;
   setSolution: (s: string) => void;
+  setStyle: (patch: Partial<TextStyle>) => void;
   _applySnapshot: (snap: { questions: Question[]; currentId: string }) => void;
 }
 
@@ -163,10 +214,20 @@ export const useMcq = create<State>((set, get) => ({
   gridViewOpen: false,
   previewOpen: false,
   projectSettingsOpen: false,
+  navSource: null,
   setGridViewOpen: (v) => set({ gridViewOpen: v }),
   setPreviewOpen: (v) => set({ previewOpen: v }),
   setProjectSettingsOpen: (v) => set({ projectSettingsOpen: v }),
-  setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
+  setCurrent: (id, source = "click") => set({ currentId: id, selectedItemId: null, navSource: source }),
+  setStyle: (patch) => {
+    h("setStyle");
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId ? { ...q, style: { ...DEFAULT_TEXT_STYLE, ...q.style, ...patch } } : q,
+      ),
+    }));
+  },
+  
   addQuestion: () => {
     h("addQuestion");
     const q = blankQuestion();

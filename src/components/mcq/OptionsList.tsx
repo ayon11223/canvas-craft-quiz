@@ -4,7 +4,7 @@ import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifi
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock, Eraser } from "lucide-react";
-import { LABEL_STYLES, useCurrentQuestion, useMcq, type Option } from "@/lib/mcq-store";
+import { LABEL_STYLES, useCurrentQuestion, useMcq, textStyleToCss, type Option, type TextStyle } from "@/lib/mcq-store";
 import { useLongPress } from "@/hooks/use-long-press";
 
 export function OptionsList() {
@@ -54,6 +54,7 @@ export function OptionsList() {
                   label={renderLabel(i)}
                   labelHandlers={longPress}
                   tickStyle={q.tickStyle}
+                  textStyle={q.style}
                 />
               ))}
             </div>
@@ -95,11 +96,13 @@ function SortableOption({
   label,
   labelHandlers,
   tickStyle,
+  textStyle,
 }: {
   option: Option;
   label: string;
   labelHandlers: ReturnType<typeof useLongPress>;
   tickStyle: "label" | "green" | "side" | "none" | "circle";
+  textStyle?: TextStyle;
 }) {
   const { setOption } = useMcq();
   const [focused, setFocused] = useState(false);
@@ -155,7 +158,8 @@ function SortableOption({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={`Option ${label}`}
-        className="flex-1 min-w-0 bg-transparent text-sm py-3 outline-none placeholder:text-muted-foreground/60"
+        style={textStyleToCss(textStyle)}
+        className="flex-1 min-w-0 bg-transparent py-3 outline-none placeholder:text-muted-foreground/60"
       />
       <div className="flex items-center gap-1 shrink-0">
         <span

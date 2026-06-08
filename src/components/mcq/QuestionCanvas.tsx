@@ -1,7 +1,7 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronsUpDown, X, Plus, Trash2 } from "lucide-react";
-import { useCurrentQuestion, useMcq, type CanvasItem } from "@/lib/mcq-store";
+import { useCurrentQuestion, useMcq, textStyleToCss, type CanvasItem } from "@/lib/mcq-store";
 import { pushHistory } from "@/lib/history";
 import { Shape } from "./Shape";
 
@@ -31,7 +31,8 @@ export function QuestionCanvas() {
               value={q.text}
               onChange={(e) => updateCurrent({ text: e.target.value })}
               placeholder="Type your question..."
-              className="flex-1 h-full bg-transparent resize-none outline-none text-[15px] leading-snug placeholder:text-canvas-foreground/40"
+              style={textStyleToCss(q.style)}
+              className="flex-1 h-full bg-transparent resize-none outline-none leading-snug placeholder:text-canvas-foreground/40"
             />
           )}
         </div>
@@ -106,7 +107,8 @@ function FigureArea() {
         value={q.text}
         onChange={(e) => updateCurrent({ text: e.target.value })}
         placeholder="Type your question..."
-        className="absolute top-0 left-0 right-0 bg-transparent resize-none outline-none text-[13px] leading-snug text-canvas-foreground/90 placeholder:text-canvas-foreground/40 h-10"
+        style={textStyleToCss(q.style)}
+        className="absolute top-0 left-0 right-0 bg-transparent resize-none outline-none leading-snug text-canvas-foreground/90 placeholder:text-canvas-foreground/40 h-10"
       />
       <AnimatePresence>
         {q.items.map((it) => (
