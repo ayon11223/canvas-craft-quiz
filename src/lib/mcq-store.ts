@@ -200,9 +200,19 @@ export const useMcq = create<State>((set, get) => ({
   gridViewOpen: false,
   previewOpen: false,
   projectSettingsOpen: false,
+  navSource: null,
   setGridViewOpen: (v) => set({ gridViewOpen: v }),
   setPreviewOpen: (v) => set({ previewOpen: v }),
   setProjectSettingsOpen: (v) => set({ projectSettingsOpen: v }),
+  setCurrent: (id, source = "click") => set({ currentId: id, selectedItemId: null, navSource: source }),
+  setStyle: (patch) => {
+    h("setStyle");
+    set((s) => ({
+      questions: s.questions.map((q) =>
+        q.id === s.currentId ? { ...q, style: { ...DEFAULT_TEXT_STYLE, ...q.style, ...patch } } : q,
+      ),
+    }));
+  },
   setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
   addQuestion: () => {
     h("addQuestion");
