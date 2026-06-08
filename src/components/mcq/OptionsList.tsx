@@ -54,6 +54,7 @@ export function OptionsList() {
                   label={renderLabel(i)}
                   labelHandlers={longPress}
                   tickStyle={q.tickStyle}
+                  textStyle={q.style}
                 />
               ))}
             </div>
