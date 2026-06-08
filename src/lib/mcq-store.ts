@@ -122,7 +122,8 @@ interface State {
   previewOpen: boolean;
   projectSettingsOpen: boolean;
   tableDialog: { mode: TableMode } | null;
-  setCurrent: (id: string) => void;
+  navSource: NavSource;
+  setCurrent: (id: string, source?: NavSource) => void;
   addQuestion: () => void;
   reorderQuestions: (ids: string[]) => void;
   duplicateQuestion: (id: string) => void;
