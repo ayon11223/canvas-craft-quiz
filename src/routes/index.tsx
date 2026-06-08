@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Editor() {
-  const { questions, currentId, setCurrent } = useMcq();
+  const { questions, currentId, setCurrent, navSource } = useMcq();
   const [direction, setDirection] = useState(0);
   const prevId = useRef(currentId);
   const start = useRef<{ x: number; y: number; t: number; blocked: boolean; locked: "h" | "v" | null } | null>(null);
@@ -83,11 +83,9 @@ function Editor() {
     const t = e.touches[0];
     const dx = t.clientX - s.x;
     const dy = t.clientY - s.y;
-    // Lock axis after meaningful movement.
     if (!s.locked && Math.abs(dx) + Math.abs(dy) > 12) {
       s.locked = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
     }
-    // If user scrolls vertically, abort swipe.
     if (s.locked === "v") {
       start.current = null;
     }
@@ -106,9 +104,23 @@ function Editor() {
     const next = dx < 0 ? idx + 1 : idx - 1;
     if (next >= 0 && next < questions.length) {
       setDirection(dx < 0 ? 1 : -1);
-      setCurrent(questions[next].id);
+      setCurrent(questions[next].id, "swipe");
     }
   };
+
+  // Animation variants by navigation source.
+  const isGrid = navSource === "grid";
+  const variants = isGrid
+    ? {
+        initial: { scale: 0.7, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 1.08, opacity: 0 },
+      }
+    : {
+        initial: { x: direction === 0 ? 0 : direction * 100 + "%", opacity: 1 },
+        animate: { x: 0, opacity: 1 },
+        exit: { x: direction * -100 + "%", opacity: 1 },
+      };
 
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
@@ -119,14 +131,17 @@ function Editor() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <AnimatePresence mode="wait" custom={direction} initial={false}>
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentId}
-            custom={direction}
-            initial={{ x: direction === 0 ? 0 : direction * 60, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: direction * -60, opacity: 0 }}
-            transition={{ type: "tween", duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+            initial={variants.initial}
+            animate={variants.animate}
+            exit={variants.exit}
+            transition={
+              isGrid
+                ? { type: "spring", stiffness: 260, damping: 26 }
+                : { type: "tween", duration: 0.3, ease: [0.32, 0.72, 0, 1] }
+            }
           >
             <QuestionCanvas />
             <OptionsList />
@@ -145,6 +160,7 @@ function Editor() {
       <SlideGrid />
       <PrintPreview />
       <ProjectSettings />
+      <FloatingFormatBar />
     </div>
   );
 }
