@@ -4,7 +4,7 @@ import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifi
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Check, Shuffle, Settings2, Lock, Eraser } from "lucide-react";
-import { LABEL_STYLES, useCurrentQuestion, useMcq, type Option } from "@/lib/mcq-store";
+import { LABEL_STYLES, useCurrentQuestion, useMcq, textStyleToCss, type Option, type TextStyle } from "@/lib/mcq-store";
 import { useLongPress } from "@/hooks/use-long-press";
 
 export function OptionsList() {
