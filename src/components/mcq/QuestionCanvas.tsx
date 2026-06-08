@@ -107,7 +107,8 @@ function FigureArea() {
         value={q.text}
         onChange={(e) => updateCurrent({ text: e.target.value })}
         placeholder="Type your question..."
-        className="absolute top-0 left-0 right-0 bg-transparent resize-none outline-none text-[13px] leading-snug text-canvas-foreground/90 placeholder:text-canvas-foreground/40 h-10"
+        style={textStyleToCss(q.style)}
+        className="absolute top-0 left-0 right-0 bg-transparent resize-none outline-none leading-snug text-canvas-foreground/90 placeholder:text-canvas-foreground/40 h-10"
       />
       <AnimatePresence>
         {q.items.map((it) => (
