@@ -92,6 +92,19 @@ export const FONT_FAMILIES = [
 
 export type NavSource = "swipe" | "grid" | "click" | null;
 
+export function textStyleToCss(s: TextStyle | undefined): React.CSSProperties {
+  const st = { ...DEFAULT_TEXT_STYLE, ...(s ?? {}) };
+  return {
+    fontFamily: st.fontFamily,
+    fontSize: st.fontSize,
+    fontWeight: st.bold ? 700 : undefined,
+    fontStyle: st.italic ? "italic" : undefined,
+    textDecoration: st.underline ? "underline" : undefined,
+    textAlign: st.align,
+    color: st.color,
+  };
+}
+
 export interface Question {
   id: string;
   text: string;
