@@ -31,7 +31,8 @@ export function QuestionCanvas() {
               value={q.text}
               onChange={(e) => updateCurrent({ text: e.target.value })}
               placeholder="Type your question..."
-              className="flex-1 h-full bg-transparent resize-none outline-none text-[15px] leading-snug placeholder:text-canvas-foreground/40"
+              style={textStyleToCss(q.style)}
+              className="flex-1 h-full bg-transparent resize-none outline-none leading-snug placeholder:text-canvas-foreground/40"
             />
           )}
         </div>
