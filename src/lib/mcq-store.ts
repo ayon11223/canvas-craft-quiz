@@ -58,6 +58,40 @@ export interface Option {
 export type CanvasSize = "closed" | "half" | "full";
 export type TickStyle = "label" | "green" | "side" | "none" | "circle";
 
+export type TextAlign = "left" | "center" | "right" | "justify";
+export interface TextStyle {
+  fontFamily: string;
+  fontSize: number;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  align: TextAlign;
+  color?: string;
+}
+
+export const DEFAULT_TEXT_STYLE: TextStyle = {
+  fontFamily: "Inter",
+  fontSize: 15,
+  bold: false,
+  italic: false,
+  underline: false,
+  align: "left",
+};
+
+export const FONT_FAMILIES = [
+  "Inter",
+  "Calibri",
+  "Arial",
+  "Helvetica",
+  "Georgia",
+  "Times New Roman",
+  "Courier New",
+  "Hind Siliguri",
+  "Noto Serif Bengali",
+] as const;
+
+export type NavSource = "swipe" | "grid" | "click" | null;
+
 export interface Question {
   id: string;
   text: string;
@@ -69,6 +103,7 @@ export interface Question {
   tickStyle: TickStyle;
   solution: string;
   footer: string;
+  style?: TextStyle;
 }
 
 export type TableMode = "table" | "matrix";
