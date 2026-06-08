@@ -213,7 +213,7 @@ export const useMcq = create<State>((set, get) => ({
       ),
     }));
   },
-  setCurrent: (id) => set({ currentId: id, selectedItemId: null }),
+  
   addQuestion: () => {
     h("addQuestion");
     const q = blankQuestion();
