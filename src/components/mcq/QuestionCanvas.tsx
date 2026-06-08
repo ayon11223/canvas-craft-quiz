@@ -1,7 +1,7 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronsUpDown, X, Plus, Trash2 } from "lucide-react";
-import { useCurrentQuestion, useMcq, type CanvasItem } from "@/lib/mcq-store";
+import { useCurrentQuestion, useMcq, textStyleToCss, type CanvasItem } from "@/lib/mcq-store";
 import { pushHistory } from "@/lib/history";
 import { Shape } from "./Shape";
 
