@@ -96,11 +96,13 @@ function SortableOption({
   label,
   labelHandlers,
   tickStyle,
+  textStyle,
 }: {
   option: Option;
   label: string;
   labelHandlers: ReturnType<typeof useLongPress>;
   tickStyle: "label" | "green" | "side" | "none" | "circle";
+  textStyle?: TextStyle;
 }) {
   const { setOption } = useMcq();
   const [focused, setFocused] = useState(false);
