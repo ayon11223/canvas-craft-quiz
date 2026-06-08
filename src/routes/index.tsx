@@ -16,6 +16,7 @@ import { EquationsPicker } from "@/components/mcq/EquationsPicker";
 import { SlideGrid } from "@/components/mcq/SlideGrid";
 import { PrintPreview } from "@/components/mcq/PrintPreview";
 import { ProjectSettings } from "@/components/mcq/ProjectSettings";
+import { FloatingFormatBar } from "@/components/mcq/FloatingFormatBar";
 import { useMcq } from "@/lib/mcq-store";
 import { undo, redo } from "@/lib/history";
 import { installLastFocusTracker } from "@/lib/last-focus";
