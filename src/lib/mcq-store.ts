@@ -93,7 +93,7 @@ export const FONT_FAMILIES = [
 
 export type NavSource = "swipe" | "grid" | "click" | null;
 
-export function textStyleToCss(s: TextStyle | undefined): React.CSSProperties {
+export function textStyleToCss(s: TextStyle | undefined): CSSProperties {
   const st = { ...DEFAULT_TEXT_STYLE, ...(s ?? {}) };
   return {
     fontFamily: st.fontFamily,
